@@ -1,0 +1,8 @@
+.next
+node_modules
+.claude
+public/uploads
+*.txt
+.git
+.DS_Store
+npm-debug.log*

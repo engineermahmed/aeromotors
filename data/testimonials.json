@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "name": "David Morrison",
+    "role": "Happy Customer",
+    "content": "Found my perfect Toyota Camry at AERO MOTORS. The team was honest about the vehicle's history, gave me a fair price, and had me driving away the same day. No hidden fees, no pressure — just straight-talking service.",
+    "rating": 5
+  },
+  {
+    "id": "2",
+    "name": "Rachel Simmons",
+    "role": "First-Time Buyer",
+    "content": "As a first-time car buyer I was nervous, but the team at AERO MOTORS made the whole process so easy. They explained everything clearly and found me a reliable Honda Accord well within my budget.",
+    "rating": 5
+  },
+  {
+    "id": "3",
+    "name": "Tom Bancroft",
+    "role": "Returning Customer",
+    "content": "Third car I've bought from AERO MOTORS and I keep coming back for a reason. Honest, fair, and genuinely helpful. My Mustang GT was exactly as described and the price was the best I found anywhere.",
+    "rating": 5
+  },
+  {
+    "id": "4",
+    "name": "Sarah Nguyen",
+    "role": "Local Buyer",
+    "content": "Traded in my old car and bought a BMW 3 Series. The trade-in offer was fair and the finance options were flexible. The whole experience took less than 2 hours. Highly recommend AERO MOTORS.",
+    "rating": 5
+  }
+]

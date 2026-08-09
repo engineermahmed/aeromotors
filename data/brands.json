@@ -1,0 +1,57 @@
+[
+  {
+    "id": "1",
+    "name": "Toyota",
+    "count": 2
+  },
+  {
+    "id": "2",
+    "name": "Honda",
+    "count": 19
+  },
+  {
+    "id": "3",
+    "name": "Ford",
+    "count": 22
+  },
+  {
+    "id": "4",
+    "name": "BMW",
+    "count": 14
+  },
+  {
+    "id": "5",
+    "name": "Mercedes-Benz",
+    "count": 11
+  },
+  {
+    "id": "6",
+    "name": "Chevrolet",
+    "count": 17
+  },
+  {
+    "id": "7",
+    "name": "Jeep",
+    "count": 13
+  },
+  {
+    "id": "8",
+    "name": "Volkswagen",
+    "count": 9
+  },
+  {
+    "id": "9",
+    "name": "Nissan",
+    "count": 16
+  },
+  {
+    "id": "10",
+    "name": "Hyundai",
+    "count": 12
+  },
+  {
+    "id": "a9e7eb55-c1cd-4f37-8f2d-7544d116298a",
+    "name": "Bugatti",
+    "count": 1
+  }
+]
