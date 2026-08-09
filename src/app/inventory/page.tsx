@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { useState, useEffect, useMemo } from "react";
+import { Suspense, useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { SlidersHorizontal, ChevronDown, X, Search } from "lucide-react";
@@ -67,7 +65,7 @@ const sortOptions = [
   { label: "Mileage: Low to High", value: "mileage_asc" },
 ];
 
-export default function InventoryPage() {
+function InventoryContent() {
   const searchParams = useSearchParams();
   const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
 
@@ -287,5 +285,13 @@ export default function InventoryPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function InventoryPage() {
+  return (
+    <Suspense>
+      <InventoryContent />
+    </Suspense>
   );
 }
