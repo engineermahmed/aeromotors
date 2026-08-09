@@ -73,7 +73,7 @@ export default function Hero() {
   };
   const fadeUp = {
     hidden: { opacity: 0, y: 32 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] } },
+    show: { opacity: 1, y: 0, transition: { duration: 0.75, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } },
   };
 
   return (
@@ -110,7 +110,7 @@ export default function Hero() {
             key={i}
             initial={{ scaleY: 0 }}
             animate={{ scaleY: 1 }}
-            transition={{ duration: 1.2, delay: 0.5 + i * 0.15, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 1.2, delay: 0.5 + i * 0.15, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
             className="w-px bg-white origin-top"
             style={{ height: i === 1 ? "64px" : "32px" }}
           />
@@ -222,7 +222,7 @@ export default function Hero() {
       <motion.div
         initial={{ scaleX: 0 }}
         animate={{ scaleX: 1 }}
-        transition={{ duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] }}
         className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent origin-left"
       />
     </section>

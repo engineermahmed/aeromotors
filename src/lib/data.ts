@@ -262,7 +262,7 @@ export const vehicles: Vehicle[] = [
     mileage: 41200,
     transmission: "Automatic",
     fuelType: "Petrol",
-    bodyStyle: "Truck",
+    bodyStyle: "SUV",
     color: "Summit White",
     driveType: "4WD",
     engineSize: "5.3L EcoTec3 V8",
