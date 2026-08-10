@@ -2,7 +2,7 @@
 set -e
 
 # On first boot the /app/data volume is empty — copy seed files in
-for f in vehicles.json brands.json testimonials.json listings.json contacts.json media.json; do
+for f in vehicles.json brands.json testimonials.json listings.json contacts.json media.json users.json roles.json; do
   if [ ! -f "/app/data/$f" ]; then
     if [ -f "/app/data-seed/$f" ]; then
       cp "/app/data-seed/$f" "/app/data/$f"
@@ -13,6 +13,13 @@ for f in vehicles.json brands.json testimonials.json listings.json contacts.json
     fi
   fi
 done
+
+# Bootstrap auth.json from env var on first boot
+if [ ! -f "/app/data/auth.json" ]; then
+  PASS="${ADMIN_DEFAULT_PASSWORD:-AeroAdmin2025}"
+  printf '{"adminPassword":"%s"}\n' "$PASS" > /app/data/auth.json
+  echo "[entrypoint] created auth.json"
+fi
 
 # Ensure uploads directory exists
 mkdir -p /app/public/uploads
