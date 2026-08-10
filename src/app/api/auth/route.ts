@@ -26,7 +26,15 @@ function writeAuth(data: { adminPassword: string }) {
 export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json();
+    if (!password) return NextResponse.json({ ok: false }, { status: 401 });
     const auth = readAuth();
+
+    // Bootstrap: if no password has been configured yet, accept and save
+    if (!auth.adminPassword) {
+      writeAuth({ adminPassword: password });
+      return NextResponse.json({ ok: true });
+    }
+
     if (password === auth.adminPassword) {
       return NextResponse.json({ ok: true });
     }
