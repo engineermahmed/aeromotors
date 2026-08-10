@@ -61,6 +61,8 @@ function VehicleModal({
       : { ...emptyVehicle }
   );
   const [featureInput, setFeatureInput] = useState("");
+  const [dragOver, setDragOver] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const set = (k: string, v: unknown) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -80,6 +82,32 @@ function VehicleModal({
       set("features", [...form.features, featureInput.trim()]);
       setFeatureInput("");
     }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    setUploadingImage(true);
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetch("/api/uploads", {
+        method: "POST",
+        body: fd,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const { url } = await res.json();
+      const newImages = [...form.images, url];
+      set("images", newImages.slice(0, 10));
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleImageUpload(file);
   };
 
   return (
@@ -178,14 +206,55 @@ function VehicleModal({
             </div>
           </div>
 
-          {/* Image URLs */}
+          {/* Image Upload */}
           <div>
-            <label className={labelCls}>Image URL (Primary)</label>
-            <input className={inputCls} placeholder="https://images.unsplash.com/..." value={form.images[0] || ""} onChange={(e) => set("images", [e.target.value, ...(form.images.slice(1))])} />
-          </div>
-          <div>
-            <label className={labelCls}>Image URL (Secondary)</label>
-            <input className={inputCls} placeholder="https://images.unsplash.com/..." value={form.images[1] || ""} onChange={(e) => set("images", [form.images[0] || "", e.target.value])} />
+            <label className={labelCls}>Vehicle Images</label>
+            <div
+              onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+              onDragLeave={() => setDragOver(false)}
+              onDrop={handleDrop}
+              onClick={() => document.getElementById("image-input")?.click()}
+              className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
+                dragOver ? "border-[#8F8F93] bg-[#2A2A2A]" : "border-[#404040] hover:border-[#8F8F93]"
+              }`}
+            >
+              <Upload className="w-5 h-5 text-[#8F8F93] mx-auto mb-2" />
+              <p className="text-[#BDBDBD] text-sm">Drag & drop images or click to upload</p>
+              <input
+                id="image-input"
+                type="file"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageUpload(file);
+                }}
+                disabled={uploadingImage}
+              />
+            </div>
+            {form.images.length > 0 && (
+              <div className="mt-4 space-y-2">
+                <p className="text-[#8F8F93] text-xs uppercase tracking-wider font-medium">{form.images.length} image(s)</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {form.images.map((img, i) => (
+                    <div key={i} className="relative aspect-square rounded bg-[#2A2A2A] border border-[#404040] group overflow-hidden">
+                      {img.startsWith("/uploads/") ? (
+                        <img src={img} alt={`Vehicle ${i}`} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-[#8F8F93] text-xs text-center p-1">{new URL(img).hostname}</div>
+                      )}
+                      <button
+                        onClick={() => set("images", form.images.filter((_, j) => j !== i))}
+                        className="absolute top-1 right-1 w-6 h-6 bg-red-600/80 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                      >
+                        <X className="w-3 h-3 text-white" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Description */}

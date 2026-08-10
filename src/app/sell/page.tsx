@@ -216,6 +216,19 @@ export default function SellPage() {
     setSubmitting(true);
     setError("");
     try {
+      const imageUrls: string[] = [];
+      for (const file of form.images) {
+        const fd = new FormData();
+        fd.append("file", file);
+        const uploadRes = await fetch("/api/uploads", {
+          method: "POST",
+          body: fd,
+        });
+        if (!uploadRes.ok) throw new Error("Image upload failed");
+        const { url } = await uploadRes.json();
+        imageUrls.push(url);
+      }
+
       const payload = {
         sellerName: form.name,
         sellerPhone: form.phone,
@@ -229,7 +242,7 @@ export default function SellPage() {
         condition: form.condition,
         vin: form.vin || undefined,
         comments: form.comments || undefined,
-        imageUrls: [],
+        imageUrls,
       };
 
       const res = await fetch("/api/listings", {
