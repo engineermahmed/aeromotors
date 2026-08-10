@@ -275,7 +275,26 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                       <p className="text-[#BDBDBD] text-sm">We&apos;ll be in touch shortly.</p>
                     </div>
                   ) : (
-                    <form onSubmit={(e) => { e.preventDefault(); setSent(true); }} className="space-y-3">
+                    <form onSubmit={async (e) => {
+                      e.preventDefault();
+                      try {
+                        const res = await fetch("/api/contacts", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            name: form.name,
+                            email: form.email,
+                            phone: form.phone,
+                            subject: `Enquiry: ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+                            message: form.message || "Customer submitted an enquiry via the vehicle page.",
+                          }),
+                        });
+                        if (!res.ok) throw new Error("Failed");
+                      } catch {
+                        // still show success to user even on network error
+                      }
+                      setSent(true);
+                    }} className="space-y-3">
                       {[
                         { placeholder: "Your Name *", key: "name", type: "text", required: true },
                         { placeholder: "Email Address *", key: "email", type: "email", required: true },
