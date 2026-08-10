@@ -6,10 +6,16 @@ const AUTH_FILE = path.join(process.cwd(), "data", "auth.json");
 
 function readAuth(): { adminPassword: string } {
   try {
-    if (!fs.existsSync(AUTH_FILE)) return { adminPassword: "" };
+    if (!fs.existsSync(AUTH_FILE)) {
+      const defaultPass = process.env.ADMIN_DEFAULT_PASSWORD ?? "";
+      const init = { adminPassword: defaultPass };
+      fs.mkdirSync(path.dirname(AUTH_FILE), { recursive: true });
+      fs.writeFileSync(AUTH_FILE, JSON.stringify(init, null, 2), "utf-8");
+      return init;
+    }
     return JSON.parse(fs.readFileSync(AUTH_FILE, "utf-8"));
   } catch {
-    return { adminPassword: "" };
+    return { adminPassword: process.env.ADMIN_DEFAULT_PASSWORD ?? "" };
   }
 }
 
