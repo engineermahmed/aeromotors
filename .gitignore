@@ -48,3 +48,6 @@ next-env.d.ts
 
 # uploads (persisted via Docker volume in production)
 /public/uploads/
+
+# server-stored secrets (persisted via Docker volume in production)
+/data/auth.json

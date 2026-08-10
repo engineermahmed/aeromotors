@@ -15,7 +15,6 @@ import type { AdminUser, Role } from "@/lib/users";
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 const ADMIN_USER = "admin";
-const ADMIN_PASS = "AeroAdmin2025";
 const AUTH_KEY = "aeromotors_admin_auth";
 
 // ─── Nav ──────────────────────────────────────────────────────────────────────
@@ -470,14 +469,28 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
-      localStorage.setItem(AUTH_KEY, "true");
-      onLogin();
-    } else {
-      setError("Invalid username or password.");
+    if (username !== ADMIN_USER) { setError("Invalid username or password."); return; }
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      if (res.ok) {
+        localStorage.setItem(AUTH_KEY, "true");
+        onLogin();
+      } else {
+        setError("Invalid username or password.");
+      }
+    } catch {
+      setError("Connection error. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -536,20 +549,11 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
             </div>
           )}
 
-          <button type="submit"
-            className="w-full py-3.5 bg-white text-[#1F1E1C] font-semibold text-sm rounded hover:bg-[#BDBDBD] transition-colors cursor-pointer">
-            Sign In
+          <button type="submit" disabled={loading}
+            className="w-full py-3.5 bg-white text-[#1F1E1C] font-semibold text-sm rounded hover:bg-[#BDBDBD] transition-colors cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed">
+            {loading ? "Signing in…" : "Sign In"}
           </button>
         </form>
-
-        {/* Credentials hint */}
-        <div className="mt-5 bg-[#252525]/60 border border-[#404040] rounded-xl p-4">
-          <p className="text-[#8F8F93] text-xs text-center mb-2 font-medium uppercase tracking-wider">Demo Credentials</p>
-          <div className="space-y-1.5 text-xs text-center">
-            <p className="text-[#BDBDBD]">Username: <span className="text-white font-mono">admin</span></p>
-            <p className="text-[#BDBDBD]">Password: <span className="text-white font-mono">AeroAdmin2025</span></p>
-          </div>
-        </div>
       </motion.div>
     </div>
   );
@@ -611,6 +615,14 @@ export default function AdminPage() {
   const [usersLoading, setUsersLoading] = useState(false);
   const [userModal, setUserModal] = useState<{ open: boolean; user: AdminUser | null }>({ open: false, user: null });
   const [roleModal, setRoleModal] = useState<{ open: boolean; role: Role | null }>({ open: false, role: null });
+
+  // Change password state
+  const [pwModal, setPwModal] = useState<{ open: boolean; userId: string | null; userName: string }>({ open: false, userId: null, userName: "" });
+  const [pwCurrent, setPwCurrent] = useState("");
+  const [pwNew, setPwNew] = useState("");
+  const [pwConfirm, setPwConfirm] = useState("");
+  const [pwError, setPwError] = useState("");
+  const [pwSaving, setPwSaving] = useState(false);
 
   // Restore auth from localStorage on mount
   useEffect(() => {
@@ -975,6 +987,39 @@ export default function AdminPage() {
     showToast("Role deleted.");
   };
 
+  const handleChangePassword = async () => {
+    setPwError("");
+    if (pwNew.length < 6) { setPwError("New password must be at least 6 characters."); return; }
+    if (pwNew !== pwConfirm) { setPwError("Passwords do not match."); return; }
+    setPwSaving(true);
+    try {
+      if (pwModal.userId) {
+        // Changing a specific user's password (Super Admin action)
+        const res = await fetch(`/api/users/${pwModal.userId}/password`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ newPassword: pwNew }),
+        });
+        if (!res.ok) { const d = await res.json(); setPwError(d.error || "Failed."); return; }
+      } else {
+        // Changing the admin login password
+        const res = await fetch("/api/auth", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ currentPassword: pwCurrent, newPassword: pwNew }),
+        });
+        if (!res.ok) { const d = await res.json(); setPwError(d.error || "Failed."); return; }
+      }
+      setPwModal({ open: false, userId: null, userName: "" });
+      setPwCurrent(""); setPwNew(""); setPwConfirm(""); setPwError("");
+      showToast("Password updated successfully.");
+    } catch {
+      setPwError("Network error. Please try again.");
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   const signOut = () => {
     localStorage.removeItem(AUTH_KEY);
     setAuthed(false);
@@ -1114,6 +1159,11 @@ export default function AdminPage() {
               <p className="text-[#8F8F93] text-xs">Administrator</p>
             </div>
           </div>
+          <button onClick={() => { setPwCurrent(""); setPwNew(""); setPwConfirm(""); setPwError(""); setPwModal({ open: true, userId: null, userName: "Admin Login" }); }}
+            className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-[#8F8F93] hover:text-white hover:bg-white/5 rounded transition-colors cursor-pointer">
+            <Lock className="w-4 h-4" />
+            Change Password
+          </button>
           <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-[#8F8F93] hover:text-white hover:bg-white/5 rounded transition-colors cursor-pointer">
             <LogOut className="w-4 h-4" />
             Sign Out
@@ -1418,6 +1468,21 @@ export default function AdminPage() {
                               <p className="mt-3 text-xs text-[#8F8F93] bg-[#2A2A2A] rounded px-3 py-2">
                                 <span className="font-semibold text-white">Admin note:</span> {listing.adminNote}
                               </p>
+                            )}
+                            {listing.imageUrls && listing.imageUrls.length > 0 && (
+                              <div className="mt-4">
+                                <p className="text-[#8F8F93] text-[10px] uppercase tracking-wider mb-2 font-medium">
+                                  {listing.imageUrls.length} Photo{listing.imageUrls.length !== 1 ? "s" : ""}
+                                </p>
+                                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                                  {listing.imageUrls.map((url, i) => (
+                                    <a key={i} href={url} target="_blank" rel="noopener noreferrer"
+                                      className="relative aspect-square rounded-lg overflow-hidden bg-[#2A2A2A] border border-[#404040] hover:border-[#C8A96E]/40 transition-colors group">
+                                      <img src={url} alt={`Photo ${i + 1}`} className="w-full h-full object-cover group-hover:opacity-90 transition-opacity" />
+                                    </a>
+                                  ))}
+                                </div>
+                              </div>
                             )}
                           </div>
 
@@ -1927,11 +1992,15 @@ export default function AdminPage() {
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-2">
                               <button onClick={() => setUserModal({ open: true, user: u })}
-                                className="p-1.5 text-[#8F8F93] hover:text-white hover:bg-[#404040] rounded transition-all cursor-pointer">
+                                className="p-1.5 text-[#8F8F93] hover:text-white hover:bg-[#404040] rounded transition-all cursor-pointer" title="Edit user">
                                 <Edit2 className="w-4 h-4" />
                               </button>
+                              <button onClick={() => { setPwCurrent(""); setPwNew(""); setPwConfirm(""); setPwError(""); setPwModal({ open: true, userId: u.id, userName: u.name }); }}
+                                className="p-1.5 text-[#8F8F93] hover:text-[#C8A96E] hover:bg-[#C8A96E]/10 rounded transition-all cursor-pointer" title="Set password">
+                                <Lock className="w-4 h-4" />
+                              </button>
                               <button onClick={() => handleDeleteUser(u.id)}
-                                className="p-1.5 text-[#8F8F93] hover:text-red-400 hover:bg-red-900/20 rounded transition-all cursor-pointer">
+                                className="p-1.5 text-[#8F8F93] hover:text-red-400 hover:bg-red-900/20 rounded transition-all cursor-pointer" title="Delete user">
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
@@ -2298,6 +2367,60 @@ export default function AdminPage() {
             onSave={handleSaveRole}
             onClose={() => setRoleModal({ open: false, role: null })}
           />
+        )}
+
+        {/* Change Password Modal */}
+        {pwModal.open && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-[#252525] border border-[#404040] rounded-xl p-6 w-full max-w-md shadow-2xl">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h3 className="font-heading font-semibold text-white text-lg">Change Password</h3>
+                  <p className="text-[#8F8F93] text-xs mt-0.5">{pwModal.userId ? `Setting password for ${pwModal.userName}` : "Update your admin login password"}</p>
+                </div>
+                <button onClick={() => setPwModal({ open: false, userId: null, userName: "" })}
+                  className="text-[#8F8F93] hover:text-white transition-colors cursor-pointer"><X className="w-5 h-5" /></button>
+              </div>
+              <div className="space-y-4">
+                {!pwModal.userId && (
+                  <div>
+                    <label className="block text-[#8F8F93] text-[10px] uppercase tracking-wider mb-1.5 font-medium">Current Password</label>
+                    <input type="password" value={pwCurrent} onChange={(e) => { setPwCurrent(e.target.value); setPwError(""); }}
+                      placeholder="Enter current password"
+                      className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors" />
+                  </div>
+                )}
+                <div>
+                  <label className="block text-[#8F8F93] text-[10px] uppercase tracking-wider mb-1.5 font-medium">New Password</label>
+                  <input type="password" value={pwNew} onChange={(e) => { setPwNew(e.target.value); setPwError(""); }}
+                    placeholder="At least 6 characters"
+                    className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors" />
+                </div>
+                <div>
+                  <label className="block text-[#8F8F93] text-[10px] uppercase tracking-wider mb-1.5 font-medium">Confirm New Password</label>
+                  <input type="password" value={pwConfirm} onChange={(e) => { setPwConfirm(e.target.value); setPwError(""); }}
+                    placeholder="Repeat new password"
+                    className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors" />
+                </div>
+                {pwError && (
+                  <div className="flex items-center gap-2 text-red-400 text-sm bg-red-900/20 border border-red-800/40 rounded px-3 py-2">
+                    <AlertTriangle className="w-4 h-4 shrink-0" />{pwError}
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button onClick={() => setPwModal({ open: false, userId: null, userName: "" })}
+                  className="flex-1 py-2.5 border border-[#404040] text-[#8F8F93] text-sm rounded hover:text-white hover:border-[#8F8F93] transition-all cursor-pointer">
+                  Cancel
+                </button>
+                <button onClick={handleChangePassword} disabled={pwSaving}
+                  className="flex-1 py-2.5 bg-white text-[#1F1E1C] font-semibold text-sm rounded hover:bg-[#BDBDBD] disabled:opacity-60 disabled:cursor-not-allowed transition-colors cursor-pointer">
+                  {pwSaving ? "Saving…" : "Update Password"}
+                </button>
+              </div>
+            </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

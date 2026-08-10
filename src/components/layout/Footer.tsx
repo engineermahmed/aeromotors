@@ -179,24 +179,15 @@ export default function Footer() {
             © {new Date().getFullYear()} AERO MOTORS. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
-            <Link
-              href="/"
+            <Link href="/" className="text-[#8F8F93] hover:text-white text-xs transition-colors">Privacy Policy</Link>
+            <Link href="/" className="text-[#8F8F93] hover:text-white text-xs transition-colors">Terms of Service</Link>
+            <Link href="/" className="text-[#8F8F93] hover:text-white text-xs transition-colors">Cookie Policy</Link>
+            <a
+              href="mailto:engineer.mahmed@gmail.com"
               className="text-[#8F8F93] hover:text-white text-xs transition-colors"
             >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/"
-              className="text-[#8F8F93] hover:text-white text-xs transition-colors"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              href="/"
-              className="text-[#8F8F93] hover:text-white text-xs transition-colors"
-            >
-              Cookie Policy
-            </Link>
+              Created by <span className="text-[#C8A96E] hover:text-white transition-colors">MA Solutions</span>
+            </a>
           </div>
         </div>
       </div>

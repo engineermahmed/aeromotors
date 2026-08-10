@@ -8,6 +8,7 @@ export interface AdminUser {
   role: string;
   status: "active" | "inactive";
   createdAt: string;
+  password?: string;
 }
 
 export interface Role {
@@ -61,4 +62,13 @@ export function saveRole(role: Role) {
 export function deleteRole(id: string) {
   const roles = getRoles().filter((r) => r.id !== id);
   writeFile(ROLES_FILE, roles);
+}
+
+export function changeUserPassword(id: string, newPassword: string): boolean {
+  const users = getUsers();
+  const idx = users.findIndex((u) => u.id === id);
+  if (idx < 0) return false;
+  users[idx].password = newPassword;
+  writeFile(USERS_FILE, users);
+  return true;
 }
