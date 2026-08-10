@@ -18,14 +18,14 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
   const [shine, setShine] = useState({ x: 50, y: 50 });
   const [hovered, setHovered] = useState(false);
 
-  const formattedPrice = new Intl.NumberFormat("en-US", {
+  const formattedPrice = new Intl.NumberFormat("en-CA", {
     style: "currency",
-    currency: "USD",
+    currency: "CAD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(vehicle.price);
 
-  const formattedMileage = new Intl.NumberFormat("en-US").format(vehicle.mileage);
+  const formattedMileage = new Intl.NumberFormat("en-CA").format(vehicle.mileage);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const card = cardRef.current;

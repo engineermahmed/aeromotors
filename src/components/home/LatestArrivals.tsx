@@ -79,7 +79,7 @@ export default function LatestArrivals() {
                     <div className="flex gap-4 text-[#BDBDBD] text-sm">
                       <span className="flex items-center gap-1.5">
                         <Gauge className="w-4 h-4 text-[#8F8F93]" />
-                        {new Intl.NumberFormat("en-US").format(latest[0]?.mileage || 0)} mi
+                        {new Intl.NumberFormat("en-CA").format(latest[0]?.mileage || 0)} mi
                       </span>
                       <span className="flex items-center gap-1.5">
                         <Settings className="w-4 h-4 text-[#8F8F93]" />
@@ -87,9 +87,9 @@ export default function LatestArrivals() {
                       </span>
                     </div>
                     <p className="font-heading font-bold text-white text-2xl">
-                      {new Intl.NumberFormat("en-US", {
+                      {new Intl.NumberFormat("en-CA", {
                         style: "currency",
-                        currency: "USD",
+                        currency: "CAD",
                         minimumFractionDigits: 0,
                       }).format(latest[0]?.price || 0)}
                     </p>
@@ -132,9 +132,9 @@ export default function LatestArrivals() {
                       <div className="flex items-center justify-between">
                         <p className="text-[#BDBDBD] text-xs">{vehicle.year}</p>
                         <p className="font-heading font-bold text-white text-lg">
-                          {new Intl.NumberFormat("en-US", {
+                          {new Intl.NumberFormat("en-CA", {
                             style: "currency",
-                            currency: "USD",
+                            currency: "CAD",
                             minimumFractionDigits: 0,
                           }).format(vehicle.price)}
                         </p>

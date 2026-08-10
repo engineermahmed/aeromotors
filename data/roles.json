@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "name": "Super Admin",
+    "description": "Full access to all sections",
+    "permissions": ["dashboard", "vehicles", "listings", "brands", "testimonials", "contact", "sell", "media", "users", "roles", "finance"],
+    "color": "gold"
+  },
+  {
+    "id": "2",
+    "name": "Manager",
+    "description": "Can manage inventory, listings and contact requests",
+    "permissions": ["dashboard", "vehicles", "listings", "contact", "sell", "media"],
+    "color": "blue"
+  },
+  {
+    "id": "3",
+    "name": "Editor",
+    "description": "Can view and edit vehicles and media only",
+    "permissions": ["dashboard", "vehicles", "media"],
+    "color": "green"
+  },
+  {
+    "id": "4",
+    "name": "Viewer",
+    "description": "Read-only access to dashboard and listings",
+    "permissions": ["dashboard", "listings"],
+    "color": "gray"
+  }
+]

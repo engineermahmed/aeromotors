@@ -11,6 +11,7 @@ import {
   ThumbsUp, ThumbsDown, Clock, Phone, RefreshCw, Upload,
 } from "lucide-react";
 import { Vehicle, Listing, ContactSubmission, MediaItem } from "@/types";
+import type { AdminUser, Role } from "@/lib/users";
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 const ADMIN_USER = "admin";
@@ -149,7 +150,7 @@ function VehicleModal({
           {/* Price / Mileage */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className={labelCls}>Price (USD) *</label>
+              <label className={labelCls}>Price (CAD) *</label>
               <input type="number" className={inputCls} placeholder="22900" value={form.price || ""} onChange={(e) => set("price", Number(e.target.value))} />
             </div>
             <div>
@@ -237,12 +238,20 @@ function VehicleModal({
               <div className="mt-4 space-y-2">
                 <p className="text-[#8F8F93] text-xs uppercase tracking-wider font-medium">{form.images.length} image(s)</p>
                 <div className="grid grid-cols-3 gap-2">
-                  {form.images.map((img, i) => (
+                  {form.images.filter(Boolean).map((img, i) => (
                     <div key={i} className="relative aspect-square rounded bg-[#2A2A2A] border border-[#404040] group overflow-hidden">
                       {img.startsWith("/uploads/") ? (
                         <img src={img} alt={`Vehicle ${i}`} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[#8F8F93] text-xs text-center p-1">{new URL(img).hostname}</div>
+                        <div className="w-full h-full flex items-center justify-center text-[#8F8F93] text-xs text-center p-1">
+                          {(() => {
+                            try {
+                              return new URL(img).hostname;
+                            } catch {
+                              return img.substring(0, 20);
+                            }
+                          })()}
+                        </div>
                       )}
                       <button
                         onClick={() => set("images", form.images.filter((_, j) => j !== i))}
@@ -310,6 +319,111 @@ function VehicleModal({
             className="flex-1 py-3 bg-white text-[#1F1E1C] font-semibold text-sm rounded hover:bg-[#BDBDBD] transition-colors disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2">
             <Save className="w-4 h-4" />
             {isEdit ? "Save Changes" : "Add Vehicle"}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ─── User Modal ───────────────────────────────────────────────────────────────
+function UserModal({ user, roles, onSave, onClose }: { user: AdminUser | null; roles: Role[]; onSave: (u: AdminUser) => void; onClose: () => void }) {
+  const [form, setForm] = useState<AdminUser>(user ?? { id: "", name: "", email: "", role: roles[0]?.name ?? "Editor", status: "active", createdAt: "" });
+  const set = (k: keyof AdminUser, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+        className="relative bg-[#252525] border border-[#404040] rounded-xl w-full max-w-md p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-heading font-bold text-white text-lg">{user ? "Edit User" : "Add User"}</h2>
+          <button onClick={onClose} className="text-[#8F8F93] hover:text-white cursor-pointer"><X className="w-5 h-5" /></button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-1.5 font-medium">Full Name *</label>
+            <input className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors"
+              placeholder="John Smith" value={form.name} onChange={(e) => set("name", e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-1.5 font-medium">Email *</label>
+            <input type="email" className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors"
+              placeholder="user@example.com" value={form.email} onChange={(e) => set("email", e.target.value)} />
+          </div>
+          <div>
+            <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-1.5 font-medium">Role</label>
+            <select className="w-full bg-[#2A2A2A] border border-[#404040] text-white rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors cursor-pointer"
+              value={form.role} onChange={(e) => set("role", e.target.value)}>
+              {roles.map((r) => <option key={r.id}>{r.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-1.5 font-medium">Status</label>
+            <select className="w-full bg-[#2A2A2A] border border-[#404040] text-white rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors cursor-pointer"
+              value={form.status} onChange={(e) => set("status", e.target.value as "active" | "inactive")}>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div className="flex gap-3 mt-6">
+          <button onClick={onClose} className="flex-1 py-2.5 border border-[#404040] text-[#BDBDBD] text-sm rounded hover:border-[#8F8F93] cursor-pointer">Cancel</button>
+          <button onClick={() => onSave(form)} disabled={!form.name || !form.email}
+            className="flex-1 py-2.5 bg-white text-[#1F1E1C] text-sm font-semibold rounded hover:bg-[#BDBDBD] disabled:opacity-40 cursor-pointer">
+            {user ? "Save Changes" : "Create User"}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// ─── Role Modal ────────────────────────────────────────────────────────────────
+const ALL_SECTIONS = ["dashboard","vehicles","listings","brands","testimonials","contact","sell","media","users","roles","finance"];
+function RoleModal({ role, onSave, onClose }: { role: Role | null; onSave: (r: Role) => void; onClose: () => void }) {
+  const [form, setForm] = useState<Role>(role ?? { id: "", name: "", description: "", permissions: [], color: "gray" });
+  const togglePerm = (p: string) =>
+    setForm((f) => ({ ...f, permissions: f.permissions.includes(p) ? f.permissions.filter((x) => x !== p) : [...f.permissions, p] }));
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={onClose} />
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+        className="relative bg-[#252525] border border-[#404040] rounded-xl w-full max-w-md p-6 max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="font-heading font-bold text-white text-lg">{role ? "Edit Role" : "Add Role"}</h2>
+          <button onClick={onClose} className="text-[#8F8F93] hover:text-white cursor-pointer"><X className="w-5 h-5" /></button>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-1.5 font-medium">Role Name *</label>
+            <input className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors"
+              placeholder="e.g. Manager" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-1.5 font-medium">Description</label>
+            <input className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors"
+              placeholder="Brief description of this role" value={form.description} onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))} />
+          </div>
+          <div>
+            <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-2 font-medium">Permissions</label>
+            <div className="grid grid-cols-2 gap-2">
+              {ALL_SECTIONS.map((s) => (
+                <button key={s} onClick={() => togglePerm(s)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded text-sm transition-all cursor-pointer ${
+                    form.permissions.includes(s) ? "bg-[#C8A96E]/15 border border-[#C8A96E]/40 text-[#C8A96E]" : "bg-[#2A2A2A] border border-[#404040] text-[#8F8F93] hover:border-[#8F8F93]"
+                  }`}>
+                  <CheckCircle className={`w-3.5 h-3.5 ${form.permissions.includes(s) ? "text-[#C8A96E]" : "text-[#555]"}`} />
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-3 mt-6">
+          <button onClick={onClose} className="flex-1 py-2.5 border border-[#404040] text-[#BDBDBD] text-sm rounded hover:border-[#8F8F93] cursor-pointer">Cancel</button>
+          <button onClick={() => onSave(form)} disabled={!form.name}
+            className="flex-1 py-2.5 bg-white text-[#1F1E1C] text-sm font-semibold rounded hover:bg-[#BDBDBD] disabled:opacity-40 cursor-pointer">
+            {role ? "Save Changes" : "Create Role"}
           </button>
         </div>
       </motion.div>
@@ -491,6 +605,13 @@ export default function AdminPage() {
   const [mediaUrlInput, setMediaUrlInput] = useState("");
   const [mediaNameInput, setMediaNameInput] = useState("");
 
+  // Users & Roles state
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [userModal, setUserModal] = useState<{ open: boolean; user: AdminUser | null }>({ open: false, user: null });
+  const [roleModal, setRoleModal] = useState<{ open: boolean; role: Role | null }>({ open: false, role: null });
+
   // Restore auth from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined" && localStorage.getItem(AUTH_KEY) === "true") {
@@ -526,6 +647,11 @@ export default function AdminPage() {
   // Fetch media whenever the tab is opened
   useEffect(() => {
     if (activeTab === "media" && authed) fetchMedia();
+  }, [activeTab, authed]);
+
+  // Fetch users/roles whenever those tabs are opened
+  useEffect(() => {
+    if ((activeTab === "users" || activeTab === "roles") && authed) fetchUsersAndRoles();
   }, [activeTab, authed]);
 
   const fetchVehicles = async () => {
@@ -793,6 +919,62 @@ export default function AdminPage() {
     }
   };
 
+  const fetchUsersAndRoles = async () => {
+    setUsersLoading(true);
+    try {
+      const res = await fetch("/api/users");
+      if (res.ok) {
+        const data = await res.json();
+        setAdminUsers(data.users);
+        setRoles(data.roles);
+      }
+    } finally {
+      setUsersLoading(false);
+    }
+  };
+
+  const handleSaveUser = async (user: AdminUser) => {
+    const isNew = !adminUsers.find((u) => u.id === user.id);
+    const res = await fetch(isNew ? "/api/users" : `/api/users/${user.id}`, {
+      method: isNew ? "POST" : "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user),
+    });
+    if (res.ok) {
+      const saved = await res.json();
+      setAdminUsers((prev) => isNew ? [...prev, saved] : prev.map((u) => u.id === saved.id ? saved : u));
+      setUserModal({ open: false, user: null });
+      showToast(isNew ? "User created." : "User updated.");
+    }
+  };
+
+  const handleDeleteUser = async (id: string) => {
+    await fetch(`/api/users/${id}`, { method: "DELETE" });
+    setAdminUsers((prev) => prev.filter((u) => u.id !== id));
+    showToast("User deleted.");
+  };
+
+  const handleSaveRole = async (role: Role) => {
+    const isNew = !roles.find((r) => r.id === role.id);
+    const res = await fetch(isNew ? "/api/roles" : `/api/roles/${role.id}`, {
+      method: isNew ? "POST" : "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(role),
+    });
+    if (res.ok) {
+      const saved = await res.json();
+      setRoles((prev) => isNew ? [...prev, saved] : prev.map((r) => r.id === saved.id ? saved : r));
+      setRoleModal({ open: false, role: null });
+      showToast(isNew ? "Role created." : "Role updated.");
+    }
+  };
+
+  const handleDeleteRole = async (id: string) => {
+    await fetch(`/api/roles/${id}`, { method: "DELETE" });
+    setRoles((prev) => prev.filter((r) => r.id !== id));
+    showToast("Role deleted.");
+  };
+
   const signOut = () => {
     localStorage.removeItem(AUTH_KEY);
     setAuthed(false);
@@ -1010,7 +1192,7 @@ export default function AdminPage() {
                           <p className="text-[#8F8F93] text-xs">{v.bodyStyle} · {new Intl.NumberFormat("en-US").format(v.mileage)} mi</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-white font-medium text-sm">{new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(v.price)}</p>
+                          <p className="text-white font-medium text-sm">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(v.price)}</p>
                           <span className={`text-xs px-2 py-0.5 rounded ${v.status === "available" ? "bg-green-900/50 text-green-400" : "bg-red-900/40 text-red-400"}`}>{v.status}</span>
                         </div>
                       </div>
@@ -1076,7 +1258,7 @@ export default function AdminPage() {
                           </td>
                           <td className="px-5 py-4 text-[#BDBDBD] text-sm">{v.year}</td>
                           <td className="px-5 py-4 text-white text-sm font-medium">
-                            {new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(v.price)}
+                            {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(v.price)}
                           </td>
                           <td className="px-5 py-4 text-[#BDBDBD] text-sm">{new Intl.NumberFormat("en-US").format(v.mileage)} mi</td>
                           <td className="px-5 py-4">
@@ -1696,8 +1878,135 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* ── Users Tab ── */}
+          {activeTab === "users" && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="font-heading font-bold text-white text-2xl">Users</h2>
+                  <p className="text-[#8F8F93] text-sm mt-1">{adminUsers.length} admin user{adminUsers.length !== 1 ? "s" : ""}</p>
+                </div>
+                <button onClick={() => setUserModal({ open: true, user: null })}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white text-[#1F1E1C] text-sm font-semibold rounded hover:bg-[#BDBDBD] transition-colors cursor-pointer">
+                  <Plus className="w-4 h-4" /> Add User
+                </button>
+              </div>
+              {usersLoading ? (
+                <div className="flex items-center justify-center py-16"><RefreshCw className="w-6 h-6 text-[#8F8F93] animate-spin" /></div>
+              ) : (
+                <div className="bg-[#252525] border border-[#404040] rounded-xl overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-[#404040]">
+                        {["Name", "Email", "Role", "Status", "Created", "Actions"].map((h) => (
+                          <th key={h} className="text-left text-[#8F8F93] text-xs uppercase tracking-wider font-medium px-5 py-3">{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {adminUsers.map((u) => (
+                        <tr key={u.id} className="border-b border-[#404040]/50 hover:bg-[#2A2A2A] transition-colors">
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-[#404040] flex items-center justify-center text-white font-semibold text-xs">
+                                {u.name.charAt(0).toUpperCase()}
+                              </div>
+                              <span className="text-white font-medium">{u.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-5 py-4 text-[#BDBDBD]">{u.email}</td>
+                          <td className="px-5 py-4">
+                            <span className="px-2.5 py-1 bg-[#C8A96E]/15 text-[#C8A96E] text-xs rounded-full font-medium">{u.role}</span>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span className={`px-2.5 py-1 text-xs rounded-full font-medium ${u.status === "active" ? "bg-green-900/30 text-green-400" : "bg-red-900/30 text-red-400"}`}>
+                              {u.status}
+                            </span>
+                          </td>
+                          <td className="px-5 py-4 text-[#8F8F93]">{u.createdAt}</td>
+                          <td className="px-5 py-4">
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => setUserModal({ open: true, user: u })}
+                                className="p-1.5 text-[#8F8F93] hover:text-white hover:bg-[#404040] rounded transition-all cursor-pointer">
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button onClick={() => handleDeleteUser(u.id)}
+                                className="p-1.5 text-[#8F8F93] hover:text-red-400 hover:bg-red-900/20 rounded transition-all cursor-pointer">
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {adminUsers.length === 0 && (
+                        <tr><td colSpan={6} className="px-5 py-12 text-center text-[#8F8F93]">No users found.</td></tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ── Roles Tab ── */}
+          {activeTab === "roles" && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="font-heading font-bold text-white text-2xl">Roles</h2>
+                  <p className="text-[#8F8F93] text-sm mt-1">{roles.length} role{roles.length !== 1 ? "s" : ""} configured</p>
+                </div>
+                <button onClick={() => setRoleModal({ open: true, role: null })}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white text-[#1F1E1C] text-sm font-semibold rounded hover:bg-[#BDBDBD] transition-colors cursor-pointer">
+                  <Plus className="w-4 h-4" /> Add Role
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {roles.map((r) => {
+                  const allSections = ["dashboard","vehicles","listings","brands","testimonials","contact","sell","media","users","roles","finance"];
+                  return (
+                    <div key={r.id} className="bg-[#252525] border border-[#404040] rounded-xl p-5">
+                      <div className="flex items-start justify-between mb-3">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <Shield className="w-4 h-4 text-[#C8A96E]" />
+                            <h3 className="font-heading font-semibold text-white">{r.name}</h3>
+                          </div>
+                          <p className="text-[#8F8F93] text-xs">{r.description}</p>
+                        </div>
+                        <div className="flex gap-1.5 ml-4 shrink-0">
+                          <button onClick={() => setRoleModal({ open: true, role: r })}
+                            className="p-1.5 text-[#8F8F93] hover:text-white hover:bg-[#404040] rounded transition-all cursor-pointer">
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button onClick={() => handleDeleteRole(r.id)}
+                            className="p-1.5 text-[#8F8F93] hover:text-red-400 hover:bg-red-900/20 rounded transition-all cursor-pointer">
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="border-t border-[#404040] pt-3 mt-3">
+                        <p className="text-[#8F8F93] text-xs uppercase tracking-wider mb-2 font-medium">Permissions ({r.permissions.length}/{allSections.length})</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {allSections.map((s) => (
+                            <span key={s} className={`px-2 py-0.5 text-xs rounded ${r.permissions.includes(s) ? "bg-[#C8A96E]/15 text-[#C8A96E]" : "bg-[#333] text-[#666]"}`}>
+                              {s}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="mt-3 text-xs text-[#8F8F93]">
+                        {adminUsers.filter((u) => u.role === r.name).length} user(s) assigned
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* ── Other tabs (placeholder) ── */}
-          {activeTab !== "dashboard" && activeTab !== "vehicles" && activeTab !== "listings" && activeTab !== "brands" && activeTab !== "testimonials" && activeTab !== "contact" && activeTab !== "sell" && activeTab !== "media" && (
+          {activeTab !== "dashboard" && activeTab !== "vehicles" && activeTab !== "listings" && activeTab !== "brands" && activeTab !== "testimonials" && activeTab !== "contact" && activeTab !== "sell" && activeTab !== "media" && activeTab !== "users" && activeTab !== "roles" && (
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <div className="w-16 h-16 bg-[#252525] border border-[#404040] rounded-xl flex items-center justify-center mb-4">
                 {(() => {
@@ -1971,6 +2280,25 @@ export default function AdminPage() {
         )}
 
         {toast && <Toast message={toast} onDone={() => setToast("")} />}
+
+        {/* User Modal */}
+        {userModal.open && (
+          <UserModal
+            user={userModal.user}
+            roles={roles}
+            onSave={handleSaveUser}
+            onClose={() => setUserModal({ open: false, user: null })}
+          />
+        )}
+
+        {/* Role Modal */}
+        {roleModal.open && (
+          <RoleModal
+            role={roleModal.role}
+            onSave={handleSaveRole}
+            onClose={() => setRoleModal({ open: false, role: null })}
+          />
+        )}
       </AnimatePresence>
     </div>
   );
