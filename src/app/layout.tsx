@@ -7,6 +7,10 @@ export const metadata: Metadata = {
     default: "AERO MOTORS | Quality Used Car Dealership",
     template: "%s | AERO MOTORS",
   },
+  icons: {
+    icon: "/logo.jpeg",
+    apple: "/logo.jpeg",
+  },
   description:
     "AERO MOTORS — Quality used cars at honest prices. Browse our hand-inspected inventory of reliable pre-owned vehicles with full history reports.",
   keywords: [
