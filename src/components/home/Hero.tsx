@@ -9,7 +9,7 @@ import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react
 const SLIDES = [
   {
     id: 0,
-    image: "/hero/Hero_Image.png",
+    image: "/hero/Hero_Image.jpg",
     eyebrow: "Just Arrived · GTA",
     headline: ["Sculpted", "for Speed"],
     sub: "The RS5 Sportback — where raw aggression meets refined German precision.",
