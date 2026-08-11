@@ -16,7 +16,7 @@ done
 
 # Bootstrap auth.json from env var on first boot
 if [ ! -f "/app/data/auth.json" ]; then
-  PASS="${ADMIN_DEFAULT_PASSWORD:-AeroAdmin2025}"
+  PASS="${ADMIN_DEFAULT_PASSWORD}"
   printf '{"adminPassword":"%s"}\n' "$PASS" > /app/data/auth.json
   echo "[entrypoint] created auth.json"
 fi
