@@ -66,7 +66,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  const formattedPrice = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(vehicle.price);
+  const formattedPrice = new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(vehicle.price);
 
   const specs = [
     { label: "Year", value: vehicle.year.toString() },
@@ -228,7 +228,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                 <div className="p-5 bg-[#2A2A2A] rounded-lg border border-[#404040] flex items-center justify-between">
                   <p className="text-[#BDBDBD] text-sm">Est. Monthly Payment</p>
                   <p className="font-heading font-bold text-white text-3xl">
-                    {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(monthlyPayment)}
+                    {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(monthlyPayment)}
                     <span className="text-[#8F8F93] text-sm font-normal">/mo</span>
                   </p>
                 </div>
@@ -249,7 +249,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                   <p className="font-heading font-bold text-white text-4xl mb-1">{formattedPrice}</p>
                   <p className="text-[#8F8F93] text-sm mb-6">
-                    or from ~{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(monthlyPayment)}/mo
+                    or from ~{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(monthlyPayment)}/mo
                   </p>
                   <div className="flex gap-3 mb-3">
                     <a href="tel:+1234567890" className="flex-1 flex items-center justify-center gap-2 py-3 bg-white text-[#1F1E1C] font-semibold text-sm rounded hover:bg-[#BDBDBD] transition-colors">

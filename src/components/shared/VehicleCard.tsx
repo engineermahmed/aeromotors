@@ -21,8 +21,9 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
   const formattedPrice = new Intl.NumberFormat("en-CA", {
     style: "currency",
     currency: "CAD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    currencyDisplay: "code",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(vehicle.price);
 
   const formattedMileage = new Intl.NumberFormat("en-CA").format(vehicle.mileage);

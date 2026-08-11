@@ -90,7 +90,8 @@ export default function LatestArrivals() {
                       {new Intl.NumberFormat("en-CA", {
                         style: "currency",
                         currency: "CAD",
-                        minimumFractionDigits: 0,
+                        currencyDisplay: "code",
+                        minimumFractionDigits: 2,
                       }).format(latest[0]?.price || 0)}
                     </p>
                   </div>

@@ -1281,7 +1281,7 @@ export default function AdminPage() {
                           <p className="text-[#8F8F93] text-xs">{v.bodyStyle} · {new Intl.NumberFormat("en-US").format(v.mileage)} mi</p>
                         </div>
                         <div className="text-right">
-                          <p className="text-white font-medium text-sm">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(v.price)}</p>
+                          <p className="text-white font-medium text-sm">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v.price)}</p>
                           <span className={`text-xs px-2 py-0.5 rounded ${v.status === "available" ? "bg-green-900/50 text-green-400" : "bg-red-900/40 text-red-400"}`}>{v.status}</span>
                         </div>
                       </div>
@@ -1347,7 +1347,7 @@ export default function AdminPage() {
                           </td>
                           <td className="px-5 py-4 text-[#BDBDBD] text-sm">{v.year}</td>
                           <td className="px-5 py-4 text-white text-sm font-medium">
-                            {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(v.price)}
+                            {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v.price)}
                           </td>
                           <td className="px-5 py-4 text-[#BDBDBD] text-sm">{new Intl.NumberFormat("en-US").format(v.mileage)} mi</td>
                           <td className="px-5 py-4">

@@ -53,7 +53,7 @@ export default function FinancePage() {
   const totalRepayable = monthly * term;
   const totalInterest = totalRepayable - loanAmount;
 
-  const fmt = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", minimumFractionDigits: 0 }).format(n);
+  const fmt = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
   const inputCls = "w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-3 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors";
   const labelCls = "block text-[#8F8F93] text-xs uppercase tracking-wider mb-2 font-medium";
 
