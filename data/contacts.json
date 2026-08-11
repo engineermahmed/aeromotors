@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": "1f6d44ce-2f9a-4d91-8829-97b625219748",
+    "name": "Muhammah Ahmed",
+    "email": "engineer.mahmed@gmail.com",
+    "phone": "00923466113",
+    "subject": "Enquiry: 2020 Ford Mustang GT Premium",
+    "message": "Hi, I'm interested in the 2020 Ford Mustang GT Premium.",
+    "submittedAt": "2026-08-10T13:55:30.376Z",
+    "read": false
+  }
+]

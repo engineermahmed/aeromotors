@@ -8,7 +8,7 @@ import {
   TrendingUp, ChevronRight, Bell, Search, LogOut, Eye,
   Lock, User, X, Plus, Edit2, Trash2, CheckCircle,
   AlertTriangle, ToggleLeft, ToggleRight, Save, ClipboardList,
-  ThumbsUp, ThumbsDown, Clock, Phone, RefreshCw, Upload,
+  ThumbsUp, ThumbsDown, Clock, Phone, RefreshCw, Upload, Settings,
 } from "lucide-react";
 import { Vehicle, Listing, ContactSubmission, MediaItem } from "@/types";
 import type { AdminUser, Role } from "@/lib/users";
@@ -30,6 +30,7 @@ const navItems = [
   { id: "media", label: "Media Library", icon: ImageIcon },
   { id: "users", label: "Users", icon: Users },
   { id: "roles", label: "Roles", icon: Shield },
+  { id: "finance-settings", label: "Finance Settings", icon: Settings },
 ];
 
 // ─── Empty vehicle template ───────────────────────────────────────────────────
@@ -378,7 +379,7 @@ function UserModal({ user, roles, onSave, onClose }: { user: AdminUser | null; r
 }
 
 // ─── Role Modal ────────────────────────────────────────────────────────────────
-const ALL_SECTIONS = ["dashboard","vehicles","listings","brands","testimonials","contact","sell","media","users","roles","finance"];
+const ALL_SECTIONS = ["dashboard","vehicles","listings","brands","testimonials","contact","sell","media","users","roles","finance","finance-settings"];
 function RoleModal({ role, onSave, onClose }: { role: Role | null; onSave: (r: Role) => void; onClose: () => void }) {
   const [form, setForm] = useState<Role>(role ?? { id: "", name: "", description: "", permissions: [], color: "gray" });
   const togglePerm = (p: string) =>
@@ -624,6 +625,12 @@ export default function AdminPage() {
   const [pwError, setPwError] = useState("");
   const [pwSaving, setPwSaving] = useState(false);
 
+  // Finance Settings state
+  const [financeSettings, setFinanceSettings] = useState({ defaultRate: 5.99, defaultTerm: 84, defaultDeposit: 5000, defaultVehiclePrice: 40000, minRate: 1.99, maxRate: 29.99 });
+  const [financeLoading, setFinanceLoading] = useState(false);
+  const [financeSaving, setFinanceSaving] = useState(false);
+  const [financeMsg, setFinanceMsg] = useState("");
+
   // Restore auth from localStorage on mount
   useEffect(() => {
     if (typeof window !== "undefined" && localStorage.getItem(AUTH_KEY) === "true") {
@@ -664,6 +671,18 @@ export default function AdminPage() {
   // Fetch users/roles whenever those tabs are opened
   useEffect(() => {
     if ((activeTab === "users" || activeTab === "roles") && authed) fetchUsersAndRoles();
+  }, [activeTab, authed]);
+
+  // Fetch finance settings when that tab is opened
+  useEffect(() => {
+    if (activeTab === "finance-settings" && authed) {
+      setFinanceLoading(true);
+      fetch("/api/finance")
+        .then((r) => r.json())
+        .then((s) => setFinanceSettings((prev) => ({ ...prev, ...s })))
+        .catch(() => {})
+        .finally(() => setFinanceLoading(false));
+    }
   }, [activeTab, authed]);
 
   const fetchVehicles = async () => {
@@ -1017,6 +1036,26 @@ export default function AdminPage() {
       setPwError("Network error. Please try again.");
     } finally {
       setPwSaving(false);
+    }
+  };
+
+  const handleSaveFinance = async () => {
+    setFinanceSaving(true);
+    setFinanceMsg("");
+    try {
+      const res = await fetch("/api/finance", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(financeSettings),
+      });
+      if (!res.ok) throw new Error("Failed to save");
+      const updated = await res.json();
+      setFinanceSettings((prev) => ({ ...prev, ...updated }));
+      setFinanceMsg("Settings saved successfully.");
+    } catch {
+      setFinanceMsg("Failed to save. Please try again.");
+    } finally {
+      setFinanceSaving(false);
     }
   };
 
@@ -2074,8 +2113,86 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* ── Finance Settings ── */}
+          {activeTab === "finance-settings" && (
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h2 className="font-heading font-bold text-white text-2xl">Finance Settings</h2>
+                  <p className="text-[#8F8F93] text-sm mt-1">Configure default values shown on the Finance page</p>
+                </div>
+              </div>
+              {financeLoading ? (
+                <div className="flex items-center gap-3 text-[#8F8F93]"><RefreshCw className="w-4 h-4 animate-spin" /><span className="text-sm">Loading…</span></div>
+              ) : (
+                <div className="max-w-xl space-y-6">
+                  <div className="bg-[#252525] border border-[#404040] rounded-xl p-6 space-y-5">
+                    <h3 className="font-heading font-semibold text-white text-base mb-1">Interest Rate</h3>
+                    <div className="grid grid-cols-3 gap-4">
+                      <div>
+                        <label className={labelCls}>Default Rate (%)</label>
+                        <input type="number" step="0.01" className={inputCls}
+                          value={financeSettings.defaultRate}
+                          onChange={(e) => setFinanceSettings((s) => ({ ...s, defaultRate: Number(e.target.value) }))} />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Min Rate (%)</label>
+                        <input type="number" step="0.01" className={inputCls}
+                          value={financeSettings.minRate}
+                          onChange={(e) => setFinanceSettings((s) => ({ ...s, minRate: Number(e.target.value) }))} />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Max Rate (%)</label>
+                        <input type="number" step="0.01" className={inputCls}
+                          value={financeSettings.maxRate}
+                          onChange={(e) => setFinanceSettings((s) => ({ ...s, maxRate: Number(e.target.value) }))} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#252525] border border-[#404040] rounded-xl p-6 space-y-5">
+                    <h3 className="font-heading font-semibold text-white text-base mb-1">Calculator Defaults</h3>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className={labelCls}>Default Term (months)</label>
+                        <select className={inputCls + " cursor-pointer"}
+                          value={financeSettings.defaultTerm}
+                          onChange={(e) => setFinanceSettings((s) => ({ ...s, defaultTerm: Number(e.target.value) }))}>
+                          {[24, 36, 48, 60, 72, 84].map((t) => <option key={t} value={t}>{t} months</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelCls}>Default Vehicle Price (CAD)</label>
+                        <input type="number" step="1000" className={inputCls}
+                          value={financeSettings.defaultVehiclePrice}
+                          onChange={(e) => setFinanceSettings((s) => ({ ...s, defaultVehiclePrice: Number(e.target.value) }))} />
+                      </div>
+                      <div>
+                        <label className={labelCls}>Default Down Payment (CAD)</label>
+                        <input type="number" step="500" className={inputCls}
+                          value={financeSettings.defaultDeposit}
+                          onChange={(e) => setFinanceSettings((s) => ({ ...s, defaultDeposit: Number(e.target.value) }))} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <button onClick={handleSaveFinance} disabled={financeSaving}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-white text-[#1F1E1C] text-sm font-semibold rounded hover:bg-[#BDBDBD] transition-colors cursor-pointer disabled:opacity-60">
+                      {financeSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                      {financeSaving ? "Saving…" : "Save Settings"}
+                    </button>
+                    {financeMsg && (
+                      <span className={`text-sm ${financeMsg.startsWith("Failed") ? "text-red-400" : "text-green-400"}`}>{financeMsg}</span>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* ── Other tabs (placeholder) ── */}
-          {activeTab !== "dashboard" && activeTab !== "vehicles" && activeTab !== "listings" && activeTab !== "brands" && activeTab !== "testimonials" && activeTab !== "contact" && activeTab !== "sell" && activeTab !== "media" && activeTab !== "users" && activeTab !== "roles" && (
+          {activeTab !== "dashboard" && activeTab !== "vehicles" && activeTab !== "listings" && activeTab !== "brands" && activeTab !== "testimonials" && activeTab !== "contact" && activeTab !== "sell" && activeTab !== "media" && activeTab !== "users" && activeTab !== "roles" && activeTab !== "finance-settings" && (
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <div className="w-16 h-16 bg-[#252525] border border-[#404040] rounded-xl flex items-center justify-center mb-4">
                 {(() => {

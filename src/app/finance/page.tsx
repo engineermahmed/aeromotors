@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle, ArrowRight, Calculator, FileText, Clock, Shield } from "lucide-react";
 import Navbar from "@/components/layout/Navbar";
@@ -21,15 +21,29 @@ const faqs = [
 ];
 
 export default function FinancePage() {
-  const [vehicle, setVehicle] = useState(80000);
-  const [deposit, setDeposit] = useState(16000);
-  const [term, setTerm] = useState(60);
-  const [rate, setRate] = useState(3.9);
+  const [vehicle, setVehicle] = useState(40000);
+  const [downPayment, setDownPayment] = useState(5000);
+  const [term, setTerm] = useState(84);
+  const [rate, setRate] = useState(5.99);
+  const [availableTerms, setAvailableTerms] = useState([24, 36, 48, 60, 72, 84]);
   const [form, setForm] = useState({ name: "", email: "", phone: "", income: "", employment: "Employed", vehiclePrice: "" });
   const [submitted, setSubmitted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-  const loanAmount = vehicle - deposit;
+  useEffect(() => {
+    fetch("/api/finance")
+      .then((r) => r.json())
+      .then((s) => {
+        setVehicle(s.defaultVehiclePrice ?? 40000);
+        setDownPayment(s.defaultDeposit ?? 5000);
+        setTerm(s.defaultTerm ?? 84);
+        setRate(s.defaultRate ?? 5.99);
+        if (s.availableTerms?.length) setAvailableTerms(s.availableTerms);
+      })
+      .catch(() => {});
+  }, []);
+
+  const loanAmount = vehicle - downPayment;
   const monthly = useMemo(() => {
     const r = rate / 100 / 12;
     if (r === 0) return loanAmount / term;
@@ -108,11 +122,11 @@ export default function FinancePage() {
                   </div>
                   <div>
                     <div className="flex justify-between mb-2">
-                      <label className={labelCls + " mb-0"}>Deposit</label>
-                      <span className="text-white text-sm font-medium">{fmt(deposit)}</span>
+                      <label className={labelCls + " mb-0"}>Down Payment</label>
+                      <span className="text-white text-sm font-medium">{fmt(downPayment)}</span>
                     </div>
-                    <input type="range" min={0} max={vehicle * 0.5} step={500} value={deposit}
-                      onChange={(e) => setDeposit(Number(e.target.value))}
+                    <input type="range" min={0} max={vehicle * 0.5} step={500} value={downPayment}
+                      onChange={(e) => setDownPayment(Number(e.target.value))}
                       className="w-full accent-white cursor-pointer" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
@@ -120,12 +134,12 @@ export default function FinancePage() {
                       <label className={labelCls}>Term (months)</label>
                       <select value={term} onChange={(e) => setTerm(Number(e.target.value))}
                         className={inputCls + " cursor-pointer"}>
-                        {[24, 36, 48, 60, 72, 84].map((t) => <option key={t} value={t}>{t} months</option>)}
+                        {availableTerms.map((t) => <option key={t} value={t}>{t} months</option>)}
                       </select>
                     </div>
                     <div>
                       <label className={labelCls}>Interest Rate (%)</label>
-                      <input type="number" step="0.1" value={rate} onChange={(e) => setRate(Number(e.target.value))} className={inputCls} />
+                      <input type="number" step="0.01" value={rate} onChange={(e) => setRate(Number(e.target.value))} className={inputCls} />
                     </div>
                   </div>
                 </div>
@@ -193,7 +207,7 @@ export default function FinancePage() {
                     </div>
                     <div>
                       <label className={labelCls}>Vehicle Price (if known)</label>
-                      <input type="number" className={inputCls} placeholder="e.g. 85000" value={form.vehiclePrice} onChange={(e) => setForm({ ...form, vehiclePrice: e.target.value })} />
+                      <input type="number" className={inputCls} placeholder="e.g. 40000" value={form.vehiclePrice} onChange={(e) => setForm({ ...form, vehiclePrice: e.target.value })} />
                     </div>
                     <button type="submit" className="w-full py-4 bg-white text-[#1F1E1C] font-semibold text-sm rounded hover:bg-[#BDBDBD] transition-colors cursor-pointer mt-2">
                       Submit Application

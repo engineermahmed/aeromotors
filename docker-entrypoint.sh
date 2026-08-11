@@ -21,6 +21,12 @@ if [ ! -f "/app/data/auth.json" ]; then
   echo "[entrypoint] created auth.json"
 fi
 
+# Seed finance.json with defaults on first boot
+if [ ! -f "/app/data/finance.json" ]; then
+  printf '{"defaultRate":5.99,"defaultTerm":84,"defaultDeposit":5000,"defaultVehiclePrice":40000,"availableTerms":[24,36,48,60,72,84],"minRate":1.99,"maxRate":29.99}\n' > /app/data/finance.json
+  echo "[entrypoint] created finance.json"
+fi
+
 # Ensure uploads directory exists
 mkdir -p /app/public/uploads
 

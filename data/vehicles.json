@@ -1,5 +1,39 @@
 [
   {
+    "id": "534beca7-ec30-4cb6-bd07-6b5fa6c1e4bd",
+    "make": "Toyota",
+    "model": "Camry",
+    "year": 2025,
+    "price": 22900,
+    "mileage": 20044,
+    "transmission": "CVT",
+    "fuelType": "Petrol",
+    "bodyStyle": "Coupe",
+    "color": "White",
+    "driveType": "RWD",
+    "engineSize": "4",
+    "horsepower": 233,
+    "images": [
+      "/uploads/63810ea9-49e8-44da-9481-4ab27abb7a14.webp",
+      "/uploads/07676516-a602-4eea-9237-2997d382c647.jpg"
+    ],
+    "description": "The car is in very good condition this car is avaliable in our showroon please vist us for pricing",
+    "features": [
+      "apple car play",
+      "android Auto",
+      "Sun Roof",
+      "Boss Sound System",
+      "after market Aloy Rim",
+      "Spoiler installed",
+      "Face lift up"
+    ],
+    "isNew": false,
+    "isFeatured": true,
+    "status": "available",
+    "vin": "12233445555",
+    "createdAt": "2026-08-10"
+  },
+  {
     "id": "1",
     "make": "Toyota",
     "model": "Camry SE",

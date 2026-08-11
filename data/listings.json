@@ -37,25 +37,5 @@
     "submittedAt": "2026-08-07T18:53:10.832Z",
     "adminNote": "",
     "reviewedAt": "2026-08-07T18:54:57.854Z"
-  },
-  {
-    "id": "5dcd9e0b-ba8e-4248-9ac2-92b33e9804e2",
-    "sellerName": "Muhammad Ahmed",
-    "sellerPhone": "03213466113",
-    "sellerEmail": "engineer.mahmed@gmail.com",
-    "make": "Toyota",
-    "model": "Camry",
-    "year": 2023,
-    "mileage": 23333,
-    "color": "Black",
-    "transmission": "Automatic",
-    "condition": "Good",
-    "vin": "1233455677888888",
-    "comments": "I want to sell my car ASAP",
-    "imageUrls": [],
-    "status": "rejected",
-    "submittedAt": "2026-08-08T09:08:46.607Z",
-    "adminNote": "The car is not good to purchase",
-    "reviewedAt": "2026-08-08T09:09:25.547Z"
   }
 ]
