@@ -24,7 +24,7 @@ const navItems = [
   { id: "listings", label: "Listing Requests", icon: ClipboardList },
   { id: "brands", label: "Brands", icon: Tag },
   { id: "testimonials", label: "Testimonials", icon: Star },
-  { id: "finance", label: "Finance Requests", icon: CreditCard },
+  { id: "finance", label: "Finance Applications", icon: CreditCard },
   { id: "contact", label: "Contact Requests", icon: Mail },
   { id: "sell", label: "Sell Car Requests", icon: Truck },
   { id: "media", label: "Media Library", icon: ImageIcon },
@@ -599,6 +599,10 @@ export default function AdminPage() {
   const [testimonialSaving, setTestimonialSaving] = useState(false);
   const [testimonialDeleteTarget, setTestimonialDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
+  // Finance Applications state
+  const [financeApps, setFinanceApps] = useState<{id:string;name:string;email:string;phone:string;annualIncome?:string;employmentStatus?:string;vehiclePrice?:string;requestedRate?:number;requestedTerm?:number;submittedAt:string;status:string}[]>([]);
+  const [financeAppsLoading, setFinanceAppsLoading] = useState(false);
+
   // Contact Requests state
   const [contacts, setContacts] = useState<ContactSubmission[]>([]);
   const [contactsLoading, setContactsLoading] = useState(false);
@@ -656,6 +660,18 @@ export default function AdminPage() {
   // Fetch testimonials whenever the tab is opened
   useEffect(() => {
     if (activeTab === "testimonials" && authed) fetchTestimonials();
+  }, [activeTab, authed]);
+
+  // Fetch finance applications whenever the tab is opened
+  useEffect(() => {
+    if (activeTab === "finance" && authed) {
+      setFinanceAppsLoading(true);
+      fetch("/api/finance-applications")
+        .then((r) => r.json())
+        .then((d) => Array.isArray(d) && setFinanceApps(d))
+        .catch(() => {})
+        .finally(() => setFinanceAppsLoading(false));
+    }
   }, [activeTab, authed]);
 
   // Fetch contacts whenever the tab is opened
@@ -2113,6 +2129,53 @@ export default function AdminPage() {
             </div>
           )}
 
+          {/* ── Finance Applications ── */}
+          {activeTab === "finance" && (
+            <div>
+              <div className="mb-6">
+                <h2 className="font-heading font-bold text-white text-2xl">Finance Applications</h2>
+                <p className="text-[#8F8F93] text-sm mt-1">{financeApps.length} application{financeApps.length !== 1 ? "s" : ""} received</p>
+              </div>
+              {financeAppsLoading ? (
+                <div className="flex items-center gap-3 text-[#8F8F93]"><RefreshCw className="w-4 h-4 animate-spin" /><span className="text-sm">Loading…</span></div>
+              ) : financeApps.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-48 text-center">
+                  <CreditCard className="w-10 h-10 text-[#404040] mb-3" />
+                  <p className="text-[#8F8F93] text-sm">No applications yet</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {financeApps.map((app) => (
+                    <div key={app.id} className="bg-[#252525] border border-[#404040] rounded-xl p-5">
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                          <h3 className="font-heading font-semibold text-white text-base">{app.name}</h3>
+                          <p className="text-[#8F8F93] text-xs mt-0.5">{new Date(app.submittedAt).toLocaleString("en-CA")}</p>
+                        </div>
+                        <span className="px-2.5 py-1 text-xs rounded-full bg-[#C8A96E]/15 text-[#C8A96E] font-medium shrink-0">New</span>
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {[
+                          { l: "Email", v: app.email },
+                          { l: "Phone", v: app.phone },
+                          { l: "Employment", v: app.employmentStatus || "—" },
+                          { l: "Annual Income", v: app.annualIncome ? `CAD ${Number(app.annualIncome).toLocaleString("en-CA")}` : "—" },
+                          { l: "Vehicle Price", v: app.vehiclePrice ? `CAD ${Number(app.vehiclePrice).toLocaleString("en-CA")}` : "—" },
+                          { l: "Term / Rate", v: app.requestedTerm ? `${app.requestedTerm} mo @ ${app.requestedRate}%` : "—" },
+                        ].map(({ l, v }) => (
+                          <div key={l} className="bg-[#2A2A2A] rounded-lg p-3">
+                            <p className="text-[#8F8F93] text-[10px] uppercase tracking-wider mb-1">{l}</p>
+                            <p className="text-white text-sm font-medium truncate">{v}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           {/* ── Finance Settings ── */}
           {activeTab === "finance-settings" && (
             <div>
@@ -2192,7 +2255,7 @@ export default function AdminPage() {
           )}
 
           {/* ── Other tabs (placeholder) ── */}
-          {activeTab !== "dashboard" && activeTab !== "vehicles" && activeTab !== "listings" && activeTab !== "brands" && activeTab !== "testimonials" && activeTab !== "contact" && activeTab !== "sell" && activeTab !== "media" && activeTab !== "users" && activeTab !== "roles" && activeTab !== "finance-settings" && (
+          {activeTab !== "dashboard" && activeTab !== "vehicles" && activeTab !== "listings" && activeTab !== "brands" && activeTab !== "testimonials" && activeTab !== "contact" && activeTab !== "sell" && activeTab !== "media" && activeTab !== "users" && activeTab !== "roles" && activeTab !== "finance" && activeTab !== "finance-settings" && (
             <div className="flex flex-col items-center justify-center h-64 text-center">
               <div className="w-16 h-16 bg-[#252525] border border-[#404040] rounded-xl flex items-center justify-center mb-4">
                 {(() => {

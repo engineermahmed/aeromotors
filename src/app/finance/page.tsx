@@ -181,7 +181,27 @@ export default function FinancePage() {
                     <p className="text-[#BDBDBD]">Our finance team will contact you within 24 hours.</p>
                   </div>
                 ) : (
-                  <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true); }} className="space-y-4">
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    try {
+                      const res = await fetch("/api/finance-applications", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          name: form.name,
+                          email: form.email,
+                          phone: form.phone,
+                          annualIncome: form.income,
+                          employmentStatus: form.employment,
+                          vehiclePrice: form.vehiclePrice,
+                          requestedRate: rate,
+                          requestedTerm: term,
+                        }),
+                      });
+                      if (!res.ok) throw new Error("Failed");
+                    } catch { /* still show success to user */ }
+                    setSubmitted(true);
+                  }} className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className={labelCls}>Full Name *</label>
