@@ -23,6 +23,8 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
   const [interestRate, setInterestRate] = useState(3.9);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [shareToast, setShareToast] = useState("");
 
   useEffect(() => {
     fetch(`/api/vehicles/${id}`)
@@ -39,7 +41,37 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
       .then((r) => r.json())
       .then((data: Vehicle[]) => Array.isArray(data) && setAllVehicles(data))
       .catch(() => {});
+    // Load saved state from localStorage
+    try {
+      const saved = JSON.parse(localStorage.getItem("aero_saved") || "[]");
+      setSaved(Array.isArray(saved) && saved.includes(id));
+    } catch { /* */ }
   }, [id]);
+
+  const toggleSave = () => {
+    try {
+      const list: string[] = JSON.parse(localStorage.getItem("aero_saved") || "[]");
+      const next = saved ? list.filter((x) => x !== id) : [...list, id];
+      localStorage.setItem("aero_saved", JSON.stringify(next));
+      setSaved(!saved);
+    } catch { /* */ }
+  };
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try { await navigator.share({ title: vehicle ? `${vehicle.year} ${vehicle.make} ${vehicle.model}` : "Vehicle", url }); return; }
+      catch { /* user cancelled */ return; }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareToast("Link copied to clipboard!");
+      setTimeout(() => setShareToast(""), 2500);
+    } catch {
+      setShareToast("Copy this link: " + url);
+      setTimeout(() => setShareToast(""), 4000);
+    }
+  };
 
   const relatedVehicles = useMemo(() => {
     if (!vehicle) return [];
@@ -146,13 +178,26 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                     <p className="text-[#8F8F93] text-xs tracking-widest uppercase mb-1">{vehicle.make}</p>
                     <h1 className="font-heading font-bold text-white text-3xl">{vehicle.year} {vehicle.model}</h1>
                   </div>
-                  <div className="flex gap-2">
-                    <button className="w-10 h-10 border border-[#404040] rounded-lg flex items-center justify-center text-[#8F8F93] hover:text-white hover:border-[#8F8F93] transition-all cursor-pointer">
-                      <Heart className="w-4 h-4" />
+                  <div className="flex gap-2 relative">
+                    <button
+                      onClick={toggleSave}
+                      aria-label={saved ? "Remove from saved" : "Save vehicle"}
+                      className={`w-10 h-10 border rounded-lg flex items-center justify-center transition-all duration-200 cursor-pointer ${saved ? "border-red-500 bg-red-500/10 text-red-400" : "border-[#404040] text-[#8F8F93] hover:text-white hover:border-[#8F8F93]"}`}
+                    >
+                      <Heart className={`w-4 h-4 transition-all duration-200 ${saved ? "fill-red-400" : ""}`} />
                     </button>
-                    <button className="w-10 h-10 border border-[#404040] rounded-lg flex items-center justify-center text-[#8F8F93] hover:text-white hover:border-[#8F8F93] transition-all cursor-pointer">
+                    <button
+                      onClick={handleShare}
+                      aria-label="Share vehicle"
+                      className="w-10 h-10 border border-[#404040] rounded-lg flex items-center justify-center text-[#8F8F93] hover:text-white hover:border-[#8F8F93] transition-all cursor-pointer"
+                    >
                       <Share2 className="w-4 h-4" />
                     </button>
+                    {shareToast && (
+                      <div className="absolute right-0 top-12 bg-[#252525] border border-[#404040] text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap z-10 shadow-xl">
+                        {shareToast}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-[#2A2A2A] rounded-lg mb-6">

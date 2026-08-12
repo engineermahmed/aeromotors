@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, ArrowRight } from "lucide-react";
+import { Phone, Mail, MapPin, ArrowRight, CheckCircle } from "lucide-react";
+import { useState } from "react";
 
 const SocialIcons = {
   Instagram: () => (
@@ -56,6 +57,35 @@ const footerLinks = {
 };
 
 export default function Footer() {
+  const [email, setEmail] = useState("");
+  const [subState, setSubState] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [subMsg, setSubMsg] = useState("");
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    setSubState("loading");
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setSubState("success");
+        setSubMsg(data.alreadySubscribed ? "You're already subscribed!" : "You're subscribed!");
+        setEmail("");
+      } else {
+        setSubState("error");
+        setSubMsg(data.error || "Something went wrong.");
+      }
+    } catch {
+      setSubState("error");
+      setSubMsg("Network error. Please try again.");
+    }
+  };
+
   return (
     <footer className="bg-[#161614] border-t border-[#404040]">
       {/* Newsletter */}
@@ -70,19 +100,35 @@ export default function Footer() {
                 Be the first to know about our latest arrivals and exclusive offers.
               </p>
             </div>
-            <form className="flex gap-3 w-full lg:w-auto">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 lg:w-72 bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-3 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 bg-white text-[#1F1E1C] text-sm font-semibold rounded hover:bg-[#BDBDBD] transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer"
-              >
-                Subscribe <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
+            {subState === "success" ? (
+              <div className="flex items-center gap-3 text-green-400">
+                <CheckCircle className="w-5 h-5 shrink-0" />
+                <span className="text-sm font-medium">{subMsg}</span>
+              </div>
+            ) : (
+              <div className="w-full lg:w-auto">
+                <form onSubmit={handleSubscribe} className="flex gap-3 w-full lg:w-auto">
+                  <input
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Your email address"
+                    className="flex-1 lg:w-72 bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-3 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors"
+                  />
+                  <button
+                    type="submit"
+                    disabled={subState === "loading"}
+                    className="px-6 py-3 bg-white text-[#1F1E1C] text-sm font-semibold rounded hover:bg-[#BDBDBD] transition-colors flex items-center gap-2 whitespace-nowrap cursor-pointer disabled:opacity-60"
+                  >
+                    {subState === "loading" ? "Subscribing…" : <><span>Subscribe</span> <ArrowRight className="w-4 h-4" /></>}
+                  </button>
+                </form>
+                {subState === "error" && (
+                  <p className="text-red-400 text-xs mt-2">{subMsg}</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

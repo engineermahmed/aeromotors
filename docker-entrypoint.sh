@@ -2,7 +2,7 @@
 set -e
 
 # On first boot the /app/data volume is empty — copy seed files in
-for f in vehicles.json brands.json testimonials.json listings.json contacts.json media.json users.json roles.json; do
+for f in vehicles.json brands.json testimonials.json listings.json contacts.json media.json users.json roles.json newsletter.json; do
   if [ ! -f "/app/data/$f" ]; then
     if [ -f "/app/data-seed/$f" ]; then
       cp "/app/data-seed/$f" "/app/data/$f"
