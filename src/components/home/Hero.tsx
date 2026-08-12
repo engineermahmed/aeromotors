@@ -266,14 +266,6 @@ export default function Hero() {
                 ))}
               </h1>
 
-              {/* Sub */}
-              <motion.p
-                variants={textItem}
-                className="text-[#B8B5B0] text-base lg:text-lg leading-relaxed mb-10 max-w-md"
-              >
-                {slide.sub}
-              </motion.p>
-
               {/* CTAs */}
               <motion.div variants={textItem} className="flex flex-col sm:flex-row gap-4">
                 <Link
