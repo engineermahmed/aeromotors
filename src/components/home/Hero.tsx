@@ -226,39 +226,8 @@ export default function Hero() {
         style={{ y: contentY, opacity }}
         className="relative z-10 w-full max-w-7xl mx-auto px-6 lg:px-16 pt-24 pb-40 flex flex-col justify-between min-h-dvh"
       >
-        {/* Top row: badge */}
-        <div className="flex items-center justify-between">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`badge-${current}`}
-              initial={{ opacity: 0, x: -16 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -8 }}
-              transition={{ duration: 0.5, ease: EASE_EXPO }}
-              className="flex items-center gap-3"
-            >
-              <span className="w-6 h-px bg-[#C8A96E]" />
-              <span className="text-[#C8A96E] text-[10px] font-semibold tracking-[0.3em] uppercase">
-                {slide.eyebrow}
-              </span>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Car badge pill */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={`pill-${current}`}
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={{ duration: 0.4, ease: EASE_EXPO, delay: 0.1 }}
-              className="hidden sm:flex items-center gap-2 bg-white/8 backdrop-blur-md border border-white/10 rounded-full px-4 py-1.5"
-            >
-              <span className="w-1.5 h-1.5 rounded-full bg-[#C8A96E]" />
-              <span className="text-white text-xs font-medium tracking-wide">{slide.badge}</span>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        {/* Top row: empty spacer to preserve layout */}
+        <div />
 
         {/* ── Headline + body ── */}
         <div className="flex-1 flex flex-col justify-center py-12 lg:py-0">
@@ -271,14 +240,6 @@ export default function Hero() {
               exit="exit"
               className="max-w-3xl"
             >
-              {/* Year / Make / Model strip */}
-              <motion.p
-                variants={textItem}
-                className="text-white/40 text-sm font-mono tracking-[0.2em] uppercase mb-6"
-              >
-                {slide.year} · {slide.make} · {slide.model}
-              </motion.p>
-
               {/* Headline — two lines, massive */}
               <h1
                 className="font-heading font-black text-white leading-[0.95] mb-8 tracking-tight"

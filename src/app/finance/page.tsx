@@ -139,7 +139,10 @@ export default function FinancePage() {
                     </div>
                     <div>
                       <label className={labelCls}>Interest Rate (%)</label>
-                      <input type="number" step="0.01" value={rate} onChange={(e) => setRate(Number(e.target.value))} className={inputCls} />
+                      <div className={inputCls + " flex items-center gap-2 cursor-default select-none"}>
+                        <span className="text-white">{rate.toFixed(2)}%</span>
+                        <span className="text-[#8F8F93] text-xs ml-auto">Set by dealer</span>
+                      </div>
                     </div>
                   </div>
                 </div>
