@@ -240,7 +240,7 @@ function VehicleModal({
                 <div className="grid grid-cols-3 gap-2">
                   {form.images.filter(Boolean).map((img, i) => (
                     <div key={i} className="relative aspect-square rounded bg-[#2A2A2A] border border-[#404040] group overflow-hidden">
-                      {img.startsWith("/uploads/") ? (
+                      {img.startsWith("/uploads/") || img.startsWith("/api/uploads/") ? (
                         <img src={img} alt={`Vehicle ${i}`} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[#8F8F93] text-xs text-center p-1">

@@ -21,8 +21,9 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
   const [imgErrors, setImgErrors] = useState<Record<number, boolean>>({});
   const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%23252525'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%23666'%3EImage unavailable%3C/text%3E%3C/svg%3E";
   const [loanAmount, setLoanAmount] = useState(0);
-  const [loanTerm, setLoanTerm] = useState(60);
-  const [interestRate, setInterestRate] = useState(3.9);
+  const [loanTerm, setLoanTerm] = useState(84);
+  const [interestRate, setInterestRate] = useState(5.99);
+  const [availableTerms, setAvailableTerms] = useState([24, 36, 48, 60, 72, 84]);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -42,6 +43,14 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
     fetch("/api/vehicles?status=available")
       .then((r) => r.json())
       .then((data: Vehicle[]) => Array.isArray(data) && setAllVehicles(data))
+      .catch(() => {});
+    fetch("/api/finance")
+      .then((r) => r.json())
+      .then((s) => {
+        if (s.defaultRate) setInterestRate(s.defaultRate);
+        if (s.defaultTerm) setLoanTerm(s.defaultTerm);
+        if (s.availableTerms?.length) setAvailableTerms(s.availableTerms);
+      })
       .catch(() => {});
     // Load saved state from localStorage
     try {
@@ -254,22 +263,24 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                 className="bg-[#252525] border border-[#404040] rounded-xl p-8">
                 <h2 className="font-heading font-bold text-white text-xl mb-6">Finance Calculator</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
-                  {[
-                    { label: "Loan Amount", value: loanAmount, onChange: (v: string) => setLoanAmount(Number(v)) },
-                    { label: "Interest Rate (%)", value: interestRate, onChange: (v: string) => setInterestRate(Number(v)), step: "0.1" },
-                  ].map((field) => (
-                    <div key={field.label}>
-                      <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-2">{field.label}</label>
-                      <input type="number" value={field.value} step={(field as { step?: string }).step}
-                        onChange={(e) => field.onChange(e.target.value)}
-                        className="w-full bg-[#2A2A2A] border border-[#404040] text-white rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors" />
+                  <div>
+                    <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-2">Loan Amount</label>
+                    <input type="number" value={loanAmount}
+                      onChange={(e) => setLoanAmount(Number(e.target.value))}
+                      className="w-full bg-[#2A2A2A] border border-[#404040] text-white rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors" />
+                  </div>
+                  <div>
+                    <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-2">Interest Rate (%)</label>
+                    <div className="w-full bg-[#2A2A2A] border border-[#404040] rounded px-3 py-2.5 text-sm flex items-center justify-between cursor-default select-none">
+                      <span className="text-white">{interestRate.toFixed(2)}%</span>
+                      <span className="text-[#8F8F93] text-xs">Set by dealer</span>
                     </div>
-                  ))}
+                  </div>
                   <div>
                     <label className="block text-[#8F8F93] text-xs uppercase tracking-wider mb-2">Term (months)</label>
                     <select value={loanTerm} onChange={(e) => setLoanTerm(Number(e.target.value))}
                       className="w-full bg-[#2A2A2A] border border-[#404040] text-white rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors cursor-pointer">
-                      {[24, 36, 48, 60, 72, 84].map((t) => <option key={t} value={t}>{t} months</option>)}
+                      {availableTerms.map((t) => <option key={t} value={t}>{t} months</option>)}
                     </select>
                   </div>
                 </div>
