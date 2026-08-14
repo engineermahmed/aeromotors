@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
       const ext = path.extname(file.name) || ".jpg";
       const filename = `${randomUUID()}${ext}`;
-      const uploadsDir = path.join(process.cwd(), "public", "uploads");
+      const uploadsDir = path.join(process.cwd(), "data", "uploads");
       const filePath = path.join(uploadsDir, filename);
 
       const buffer = Buffer.from(await file.arrayBuffer());
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
       const item: MediaItem = {
         id: randomUUID(),
-        url: `/uploads/${filename}`,
+        url: `/api/uploads/${filename}`,
         name: file.name,
         type: "upload",
         uploadedAt: new Date().toISOString(),

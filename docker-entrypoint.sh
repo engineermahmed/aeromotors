@@ -27,7 +27,9 @@ if [ ! -f "/app/data/finance.json" ]; then
   echo "[entrypoint] created finance.json"
 fi
 
-# Ensure uploads directory exists
+# Ensure uploads directory exists inside the data volume (persists across deploys)
+mkdir -p /app/data/uploads
+# Keep public/uploads for backward compatibility with old image paths
 mkdir -p /app/public/uploads
 
 exec "$@"

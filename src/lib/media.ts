@@ -3,7 +3,7 @@ import path from "path";
 import { MediaItem } from "@/types";
 
 const FILE = path.join(process.cwd(), "data", "media.json");
-const UPLOADS_DIR = path.join(process.cwd(), "public", "uploads");
+const UPLOADS_DIR = path.join(process.cwd(), "data", "uploads");
 
 function ensureFile() {
   const dir = path.dirname(FILE);
@@ -47,7 +47,9 @@ export function deleteMediaItem(id: string): { deleted: boolean; filePath?: stri
   const filtered = items.filter((m) => m.id !== id);
   writeMedia(filtered);
   if (item.type === "upload") {
-    const filePath = path.join(process.cwd(), "public", item.url);
+    // support both old /uploads/ and new /api/uploads/ paths
+    const filename = path.basename(item.url);
+    const filePath = path.join(process.cwd(), "data", "uploads", filename);
     return { deleted: true, filePath };
   }
   return { deleted: true };
