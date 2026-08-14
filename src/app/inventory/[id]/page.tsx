@@ -18,6 +18,8 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
   const [vehicle, setVehicle] = useState<Vehicle | null>(null);
   const [allVehicles, setAllVehicles] = useState<Vehicle[]>([]);
   const [activeImage, setActiveImage] = useState(0);
+  const [imgErrors, setImgErrors] = useState<Record<number, boolean>>({});
+  const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%23252525'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='18' fill='%23666'%3EImage unavailable%3C/text%3E%3C/svg%3E";
   const [loanAmount, setLoanAmount] = useState(0);
   const [loanTerm, setLoanTerm] = useState(60);
   const [interestRate, setInterestRate] = useState(3.9);
@@ -139,10 +141,11 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
                 <div className="relative aspect-[16/10] rounded-xl overflow-hidden bg-[#252525] border border-[#404040] mb-3">
                   <Image
-                    src={vehicle.images[activeImage]}
+                    src={imgErrors[activeImage] ? PLACEHOLDER : vehicle.images[activeImage]}
                     alt={`${vehicle.make} ${vehicle.model}`}
                     fill className="object-cover" priority
                     sizes="(max-width: 1280px) 100vw, 66vw"
+                    onError={() => setImgErrors(e => ({ ...e, [activeImage]: true }))}
                   />
                   {vehicle.images.length > 1 && (
                     <>
@@ -164,7 +167,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                   {vehicle.images.map((img, i) => (
                     <button key={i} onClick={() => setActiveImage(i)}
                       className={`relative shrink-0 w-24 aspect-[4/3] rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${i === activeImage ? "border-white" : "border-[#404040] hover:border-[#8F8F93]"}`}>
-                      <Image src={img} alt={`View ${i + 1}`} fill className="object-cover" sizes="96px" />
+                      <Image src={imgErrors[i] ? PLACEHOLDER : img} alt={`View ${i + 1}`} fill className="object-cover" sizes="96px" onError={() => setImgErrors(e => ({ ...e, [i]: true }))} />
                     </button>
                   ))}
                 </div>

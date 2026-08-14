@@ -7,8 +7,11 @@ import { motion } from "framer-motion";
 import { ArrowRight, Gauge, Settings } from "lucide-react";
 import { Vehicle } from "@/types";
 
+const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%23252525'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%23666'%3EImage unavailable%3C/text%3E%3C/svg%3E";
+
 export default function LatestArrivals() {
   const [latest, setLatest] = useState<Vehicle[]>([]);
+  const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetch("/api/vehicles?status=available")
@@ -58,8 +61,9 @@ export default function LatestArrivals() {
             >
               <div className="relative aspect-[16/10]">
                 <Image
-                  src={latest[0]?.images[0] || ""}
+                  src={imgErrors[`0-0`] ? PLACEHOLDER : (latest[0]?.images[0] || PLACEHOLDER)}
                   alt={`${latest[0]?.make} ${latest[0]?.model}`}
+                  onError={() => setImgErrors(e => ({ ...e, "0-0": true }))}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                   sizes="(max-width: 1024px) 100vw, 66vw"
@@ -116,8 +120,9 @@ export default function LatestArrivals() {
                 >
                   <div className="relative" style={{ aspectRatio: "16/9" }}>
                     <Image
-                      src={vehicle.images[0]}
+                      src={imgErrors[`1-${i}`] ? PLACEHOLDER : vehicle.images[0]}
                       alt={`${vehicle.make} ${vehicle.model}`}
+                      onError={() => setImgErrors(e => ({ ...e, [`1-${i}`]: true }))}
                       fill
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                       sizes="(max-width: 1024px) 100vw, 33vw"

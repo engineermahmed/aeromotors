@@ -17,6 +17,8 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const [shine, setShine] = useState({ x: 50, y: 50 });
   const [hovered, setHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='500' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%23282624'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='16' fill='%23666'%3EImage unavailable%3C/text%3E%3C/svg%3E";
 
   const formattedPrice = new Intl.NumberFormat("en-CA", {
     style: "currency",
@@ -75,11 +77,12 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
             {/* Image */}
             <div className="relative aspect-[16/10] overflow-hidden bg-[#282624]">
               <Image
-                src={vehicle.images[0]}
+                src={imgError ? PLACEHOLDER : vehicle.images[0]}
                 alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-107"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                onError={() => setImgError(true)}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
