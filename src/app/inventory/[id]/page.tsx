@@ -96,7 +96,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
   const effectiveLoanAmount = useMemo(() => {
     let amt = loanAmount;
     if (taxIncluded) amt = Math.round(amt * 1.13 * 100) / 100;
-    if (licensingIncluded) amt = Math.round((amt + 170) * 100) / 100;
+    if (licensingIncluded) amt = Math.round((amt + 180) * 100) / 100;
     return amt;
   }, [loanAmount, taxIncluded, licensingIncluded]);
 
@@ -313,14 +313,14 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                     <span className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 ${licensingIncluded ? "bg-[#1F1E1C] border-[#1F1E1C]" : "border-current"}`}>
                       {licensingIncluded && <CheckCircle className="w-3 h-3" />}
                     </span>
-                    Add Licensing & Fees (+CAD 170)
+                    Add Licensing & Fees (+CAD 180)
                   </button>
                 </div>
                 {(taxIncluded || licensingIncluded) && (
                   <div className="mb-4 px-4 py-3 bg-[#2A2A2A] rounded border border-[#404040] text-xs text-[#8F8F93] space-y-1">
                     <div className="flex justify-between"><span>Base loan amount</span><span className="text-white">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(loanAmount)}</span></div>
                     {taxIncluded && <div className="flex justify-between"><span>HST (13%)</span><span className="text-white">+ {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(loanAmount * 0.13)}</span></div>}
-                    {licensingIncluded && <div className="flex justify-between"><span>Licensing & Fees</span><span className="text-white">+ CAD 170.00</span></div>}
+                    {licensingIncluded && <div className="flex justify-between"><span>Licensing & Fees</span><span className="text-white">+ CAD 180.00</span></div>}
                     <div className="flex justify-between pt-1 border-t border-[#404040]"><span className="text-[#BDBDBD]">Total financed</span><span className="text-white font-medium">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(effectiveLoanAmount)}</span></div>
                   </div>
                 )}
