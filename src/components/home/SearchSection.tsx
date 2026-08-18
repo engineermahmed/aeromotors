@@ -9,7 +9,7 @@ const makes = ["Any Make", "Toyota", "Honda", "Ford", "Chevrolet", "BMW", "Merce
 const bodyStyles = ["Any Body", "Sedan", "Coupe", "SUV", "Truck", "Hatchback", "Convertible", "Wagon", "Van"];
 const transmissions = ["Any Trans.", "Automatic", "Manual"];
 const priceRanges = ["Any Price", "Under $10K", "$10K–$20K", "$20K–$30K", "$30K–$45K", "$45K+"];
-const mileageRanges = ["Any Miles", "Under 10K", "10K–30K", "30K–60K", "60K–100K", "100K+"];
+const mileageRanges = ["Any KM", "Under 10K", "10K–30K", "30K–60K", "60K–100K", "100K+"];
 
 const inputBase = "w-full appearance-none bg-transparent text-white text-sm focus:outline-none cursor-pointer placeholder-[#8A8880]";
 
@@ -27,7 +27,7 @@ const defaultFilters: FilterState = {
   bodyStyle: "Any Body",
   transmission: "Any Trans.",
   price: "Any Price",
-  mileage: "Any Miles",
+  mileage: "Any KM",
   search: "",
 };
 

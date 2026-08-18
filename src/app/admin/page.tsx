@@ -154,7 +154,7 @@ function VehicleModal({
               <input type="number" className={inputCls} placeholder="22900" value={form.price || ""} onChange={(e) => set("price", Number(e.target.value))} />
             </div>
             <div>
-              <label className={labelCls}>Mileage (mi)</label>
+              <label className={labelCls}>Mileage (km)</label>
               <input type="number" className={inputCls} placeholder="18500" value={form.mileage || ""} onChange={(e) => set("mileage", Number(e.target.value))} />
             </div>
           </div>
@@ -1294,7 +1294,7 @@ export default function AdminPage() {
                       <div key={v.id} className="flex items-center justify-between py-3 border-b border-[#404040] last:border-0">
                         <div>
                           <p className="text-white text-sm font-medium">{v.year} {v.make} {v.model}</p>
-                          <p className="text-[#8F8F93] text-xs">{v.bodyStyle} · {new Intl.NumberFormat("en-US").format(v.mileage)} mi</p>
+                          <p className="text-[#8F8F93] text-xs">{v.bodyStyle} · {new Intl.NumberFormat("en-US").format(v.mileage)} km</p>
                         </div>
                         <div className="text-right">
                           <p className="text-white font-medium text-sm">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v.price)}</p>
@@ -1365,7 +1365,7 @@ export default function AdminPage() {
                           <td className="px-5 py-4 text-white text-sm font-medium">
                             {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v.price)}
                           </td>
-                          <td className="px-5 py-4 text-[#BDBDBD] text-sm">{new Intl.NumberFormat("en-US").format(v.mileage)} mi</td>
+                          <td className="px-5 py-4 text-[#BDBDBD] text-sm">{new Intl.NumberFormat("en-US").format(v.mileage)} km</td>
                           <td className="px-5 py-4">
                             <button onClick={() => toggleStatus(v.id)} title="Toggle status"
                               className={`text-xs px-2.5 py-1 rounded-full font-medium transition-opacity hover:opacity-70 cursor-pointer ${v.status === "available" ? "bg-green-900/40 text-green-400" : "bg-red-900/40 text-red-400"}`}>
@@ -1482,7 +1482,7 @@ export default function AdminPage() {
 
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                               {[
-                                ["Mileage", `${Number(listing.mileage).toLocaleString()} mi`],
+                                ["Mileage", `${Number(listing.mileage).toLocaleString()} km`],
                                 ["Transmission", listing.transmission],
                                 ["Condition", listing.condition],
                                 ["Color", listing.color || "—"],

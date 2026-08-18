@@ -16,7 +16,7 @@ const features = [
 const faqs = [
   { q: "What credit score do I need?", a: "We work with a range of credit profiles. While better credit scores typically qualify for lower rates, we have lenders for most situations." },
   { q: "How long does approval take?", a: "Most applications receive a decision within 24 hours. Many are approved the same day." },
-  { q: "Can I refinance my current vehicle?", a: "Yes, we offer refinancing options that can often lower your monthly payment or reduce your interest rate." },
+  { q: "Can I refinance my current vehicle?", a: "No, we do not offer refinancing. We specialize in financing for vehicle purchases only." },
   { q: "What documents do I need?", a: "Typically: proof of identity, proof of income, proof of residence, and bank statements for the last 3 months." },
 ];
 

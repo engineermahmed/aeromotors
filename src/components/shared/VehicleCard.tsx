@@ -141,7 +141,7 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
               <div className="flex items-center gap-4 pt-4 border-t border-[#383532]">
                 <div className="flex items-center gap-1.5 text-[#B8B5B0] text-xs">
                   <Gauge className="w-3.5 h-3.5 text-[#8A8880]" />
-                  <span>{formattedMileage} mi</span>
+                  <span>{formattedMileage} km</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[#B8B5B0] text-xs">
                   <Settings className="w-3.5 h-3.5 text-[#8A8880]" />

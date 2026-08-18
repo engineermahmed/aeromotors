@@ -24,6 +24,8 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
   const [loanTerm, setLoanTerm] = useState(84);
   const [interestRate, setInterestRate] = useState(5.99);
   const [availableTerms, setAvailableTerms] = useState([24, 36, 48, 60, 72, 84]);
+  const [taxIncluded, setTaxIncluded] = useState(false);
+  const [licensingIncluded, setLicensingIncluded] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
   const [sent, setSent] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -35,7 +37,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
       .then((data: Vehicle) => {
         if (data?.id) {
           setVehicle(data);
-          setLoanAmount(data.price * 0.8);
+          setLoanAmount(Math.round(data.price * 0.8 * 100) / 100);
           setForm((f) => ({ ...f, message: `Hi, I'm interested in the ${data.year} ${data.make} ${data.model}.` }));
         }
       })
@@ -91,11 +93,18 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
     return [...same, ...other].slice(0, 3);
   }, [vehicle, allVehicles]);
 
+  const effectiveLoanAmount = useMemo(() => {
+    let amt = loanAmount;
+    if (taxIncluded) amt = Math.round(amt * 1.13 * 100) / 100;
+    if (licensingIncluded) amt = Math.round((amt + 170) * 100) / 100;
+    return amt;
+  }, [loanAmount, taxIncluded, licensingIncluded]);
+
   const monthlyPayment = useMemo(() => {
     const r = interestRate / 100 / 12;
-    if (r === 0) return loanAmount / loanTerm;
-    return (loanAmount * r * Math.pow(1 + r, loanTerm)) / (Math.pow(1 + r, loanTerm) - 1);
-  }, [loanAmount, loanTerm, interestRate]);
+    if (r === 0) return effectiveLoanAmount / loanTerm;
+    return (effectiveLoanAmount * r * Math.pow(1 + r, loanTerm)) / (Math.pow(1 + r, loanTerm) - 1);
+  }, [effectiveLoanAmount, loanTerm, interestRate]);
 
   if (!vehicle) {
     return (
@@ -122,7 +131,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
     { label: "Drive Type", value: vehicle.driveType },
     { label: "Fuel Type", value: vehicle.fuelType },
     { label: "Color", value: vehicle.color },
-    { label: "Mileage", value: `${new Intl.NumberFormat("en-US").format(vehicle.mileage)} mi` },
+    { label: "Mileage", value: `${new Intl.NumberFormat("en-US").format(vehicle.mileage)} km` },
     ...(vehicle.vin ? [{ label: "VIN", value: vehicle.vin }] : []),
   ];
 
@@ -214,7 +223,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 p-5 bg-[#2A2A2A] rounded-lg mb-6">
                   {[
-                    { icon: Gauge, label: "Mileage", value: `${new Intl.NumberFormat("en-US").format(vehicle.mileage)} mi` },
+                    { icon: Gauge, label: "Mileage", value: `${new Intl.NumberFormat("en-US").format(vehicle.mileage)} km` },
                     { icon: Settings, label: "Transmission", value: vehicle.transmission },
                     { icon: Fuel, label: "Fuel Type", value: vehicle.fuelType },
                     { icon: Zap, label: "Power", value: `${vehicle.horsepower} hp` },
@@ -284,6 +293,37 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                     </select>
                   </div>
                 </div>
+                {/* Add-on toggles */}
+                <div className="flex flex-wrap gap-3 mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setTaxIncluded((v) => !v)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded border text-sm font-medium transition-all cursor-pointer ${taxIncluded ? "bg-white text-[#1F1E1C] border-white" : "bg-transparent text-[#BDBDBD] border-[#404040] hover:border-[#8F8F93] hover:text-white"}`}
+                  >
+                    <span className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 ${taxIncluded ? "bg-[#1F1E1C] border-[#1F1E1C]" : "border-current"}`}>
+                      {taxIncluded && <CheckCircle className="w-3 h-3" />}
+                    </span>
+                    Add Tax (13% HST)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLicensingIncluded((v) => !v)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded border text-sm font-medium transition-all cursor-pointer ${licensingIncluded ? "bg-white text-[#1F1E1C] border-white" : "bg-transparent text-[#BDBDBD] border-[#404040] hover:border-[#8F8F93] hover:text-white"}`}
+                  >
+                    <span className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 ${licensingIncluded ? "bg-[#1F1E1C] border-[#1F1E1C]" : "border-current"}`}>
+                      {licensingIncluded && <CheckCircle className="w-3 h-3" />}
+                    </span>
+                    Add Licensing & Fees (+CAD 170)
+                  </button>
+                </div>
+                {(taxIncluded || licensingIncluded) && (
+                  <div className="mb-4 px-4 py-3 bg-[#2A2A2A] rounded border border-[#404040] text-xs text-[#8F8F93] space-y-1">
+                    <div className="flex justify-between"><span>Base loan amount</span><span className="text-white">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(loanAmount)}</span></div>
+                    {taxIncluded && <div className="flex justify-between"><span>HST (13%)</span><span className="text-white">+ {new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(loanAmount * 0.13)}</span></div>}
+                    {licensingIncluded && <div className="flex justify-between"><span>Licensing & Fees</span><span className="text-white">+ CAD 170.00</span></div>}
+                    <div className="flex justify-between pt-1 border-t border-[#404040]"><span className="text-[#BDBDBD]">Total financed</span><span className="text-white font-medium">{new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(effectiveLoanAmount)}</span></div>
+                  </div>
+                )}
                 <div className="p-5 bg-[#2A2A2A] rounded-lg border border-[#404040] flex items-center justify-between">
                   <p className="text-[#BDBDBD] text-sm">Est. Monthly Payment</p>
                   <p className="font-heading font-bold text-white text-3xl">
@@ -326,11 +366,11 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                 {/* Inquiry Form */}
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }}
                   className="bg-[#252525] border border-[#404040] rounded-xl p-7">
-                  <h3 className="font-heading font-semibold text-white mb-5">Enquire About This Vehicle</h3>
+                  <h3 className="font-heading font-semibold text-white mb-5">Inquire About This Vehicle</h3>
                   {sent ? (
                     <div className="flex flex-col items-center text-center py-6">
                       <CheckCircle className="w-12 h-12 text-white mb-3" />
-                      <p className="font-heading font-semibold text-white mb-1">Enquiry Sent!</p>
+                      <p className="font-heading font-semibold text-white mb-1">Inquiry Sent!</p>
                       <p className="text-[#BDBDBD] text-sm">We&apos;ll be in touch shortly.</p>
                     </div>
                   ) : (
@@ -344,8 +384,8 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                             name: form.name,
                             email: form.email,
                             phone: form.phone,
-                            subject: `Enquiry: ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
-                            message: form.message || "Customer submitted an enquiry via the vehicle page.",
+                            subject: `Inquiry: ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+                            message: form.message || "Customer submitted an inquiry via the vehicle page.",
                           }),
                         });
                         if (!res.ok) throw new Error("Failed");
@@ -368,7 +408,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                         onChange={(e) => setForm({ ...form, message: e.target.value })}
                         className="w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-3 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors resize-none" />
                       <button type="submit" className="w-full py-3.5 bg-white text-[#1F1E1C] font-semibold text-sm rounded hover:bg-[#BDBDBD] transition-colors cursor-pointer">
-                        Send Enquiry
+                        Send Inquiry
                       </button>
                     </form>
                   )}

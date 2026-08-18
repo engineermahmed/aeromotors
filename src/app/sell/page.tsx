@@ -151,7 +151,7 @@ function Step4({ form, error }: { form: FormData; error: string }) {
     <div className="space-y-5">
       {[
         { title: "Your Details", rows: [["Name", form.name], ["Phone", form.phone], ["Email", form.email]] },
-        { title: "Vehicle Info", rows: [["Make", form.make], ["Model", form.model], ["Year", form.year], ["Mileage", form.mileage ? `${Number(form.mileage).toLocaleString()} mi` : "—"], ["Condition", form.condition], ["Transmission", form.transmission], ["Color", form.color || "—"]] },
+        { title: "Vehicle Info", rows: [["Make", form.make], ["Model", form.model], ["Year", form.year], ["Mileage", form.mileage ? `${Number(form.mileage).toLocaleString()} km` : "—"], ["Condition", form.condition], ["Transmission", form.transmission], ["Color", form.color || "—"]] },
       ].map(({ title, rows }) => (
         <div key={title} className="bg-[#282624] rounded-xl border border-[#383532] p-5">
           <h3 className="font-heading font-semibold text-white text-sm mb-4 pb-3 border-b border-[#383532]">{title}</h3>

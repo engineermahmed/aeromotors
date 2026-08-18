@@ -39,7 +39,7 @@ const hours = [
 ];
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "General Enquiry", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", subject: "General Inquiry", message: "" });
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -58,7 +58,7 @@ export default function ContactPage() {
               <span className="text-[#8F8F93] text-xs font-medium tracking-[0.2em] uppercase block mb-3">Get in Touch</span>
               <h1 className="font-heading font-bold text-white text-5xl lg:text-6xl mb-4">Contact Us</h1>
               <p className="text-[#BDBDBD] text-lg max-w-xl">
-                Our team is ready to assist with any enquiry. Reach out and experience the AERO MOTORS difference.
+                Our team is ready to assist with any inquiry. Reach out and experience the AERO MOTORS difference.
               </p>
             </motion.div>
           </div>
@@ -134,7 +134,7 @@ export default function ContactPage() {
                       </div>
                       <h3 className="font-heading font-bold text-white text-2xl mb-2">Message Sent!</h3>
                       <p className="text-[#BDBDBD]">Thank you for reaching out. We&apos;ll be in touch within 24 hours.</p>
-                      <button onClick={() => { setSubmitted(false); setForm({ name: "", email: "", phone: "", subject: "General Enquiry", message: "" }); }} className="mt-6 px-6 py-2.5 border border-[#404040] text-[#BDBDBD] text-sm rounded hover:border-[#8F8F93] hover:text-white transition-all cursor-pointer">
+                      <button onClick={() => { setSubmitted(false); setForm({ name: "", email: "", phone: "", subject: "General Inquiry", message: "" }); }} className="mt-6 px-6 py-2.5 border border-[#404040] text-[#BDBDBD] text-sm rounded hover:border-[#8F8F93] hover:text-white transition-all cursor-pointer">
                         Send Another
                       </button>
                     </div>
@@ -174,7 +174,7 @@ export default function ContactPage() {
                       <div>
                         <label className={labelCls}>Subject</label>
                         <select className={inputCls + " cursor-pointer"} value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })}>
-                          {["General Enquiry", "Vehicle Enquiry", "Finance Enquiry", "Sell My Car", "Test Drive", "Other"].map((s) => <option key={s}>{s}</option>)}
+                          {["General Inquiry", "Vehicle Inquiry", "Finance Inquiry", "Sell My Car", "Test Drive", "Other"].map((s) => <option key={s}>{s}</option>)}
                         </select>
                       </div>
                       <div>

@@ -128,7 +128,7 @@ export const vehicles: Vehicle[] = [
       "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=1200&q=90",
     ],
     description:
-      "Near-new 2022 BMW 3 Series 330i xDrive with just 9,400 miles. This top-spec example includes the Premium Package, Live Cockpit Professional with 12.3-inch digital display, and the full BMW Connected Drive suite. Still covered by factory warranty.",
+      "Near-new 2022 BMW 3 Series 330i xDrive with just 9,400 km. This top-spec example includes the Premium Package, Live Cockpit Professional with 12.3-inch digital display, and the full BMW Connected Drive suite. Still covered by factory warranty.",
     features: [
       "xDrive All-Wheel Drive",
       "Live Cockpit Professional",

@@ -55,7 +55,7 @@ export default function AboutPage() {
                 </h2>
                 <div className="space-y-4 text-[#BDBDBD] leading-relaxed">
                   <p>Aero Motors was founded in 2026 by Zaeem Naeem Mirza with a clear vision: to reshape the used car buying experience in the GTA. We specialize in pre-owned vehicles that are rigorously inspected, competitively priced, and backed by transparent service—so every customer leaves feeling informed and confident.</p>
-                  <p>At Aero Motors, we believe buying a car should feel empowering, not overwhelming. We offer free GTA delivery, trade-in options, and are actively working on warranty options to bring you even more peace of mind.</p>
+                  <p>At Aero Motors, we believe buying a car should feel empowering, not overwhelming. We offer trade-in options and are actively working on warranty options to bring you even more peace of mind.</p>
                   <p>Our commitment is simple: no hidden fees, no pressure, just honest deals and great cars. Welcome to your last stop.</p>
                 </div>
               </motion.div>

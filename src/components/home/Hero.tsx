@@ -302,7 +302,6 @@ export default function Hero() {
             className="hidden md:flex items-center gap-10"
           >
             {[
-              { v: "Free", l: "GTA Delivery" },
               { v: "$0", l: "Hidden Fees" },
               { v: "150+", l: "Inspection Points" },
             ].map((s) => (

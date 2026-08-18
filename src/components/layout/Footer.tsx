@@ -152,7 +152,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-[#BDBDBD] text-sm leading-relaxed mb-8 max-w-xs">
-              Quality pre-owned vehicles at honest, transparent prices. Your Last Stop for hand-inspected cars with free GTA delivery. Est. 2026.
+              Quality pre-owned vehicles at honest, transparent prices. Your Last Stop for hand-inspected cars. Est. 2026.
             </p>
 
             {/* Contact Info */}
