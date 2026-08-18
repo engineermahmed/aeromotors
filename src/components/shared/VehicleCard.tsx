@@ -64,6 +64,7 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
           transformStyle: "preserve-3d",
         }}
       >
+        <div className="relative">
         <Link href={`/inventory/${vehicle.id}`} className="group block">
           <div className="relative bg-[#222120] border border-[#383532] rounded-xl overflow-hidden transition-all duration-400 hover:border-[#C8A96E]/40 hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)]">
             {/* Shine layer */}
@@ -155,6 +156,19 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
             </div>
           </div>
         </Link>
+        {vehicle.carfaxUrl && (
+          <a
+            href={vehicle.carfaxUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute bottom-[72px] right-4 z-20 bg-white rounded px-2 py-1 shadow-lg hover:opacity-90 transition-opacity"
+            title="View CarFax Report"
+          >
+            <img src="/carfax-canada.svg" alt="CarFax Canada" width={90} height={14} />
+          </a>
+        )}
+        </div>
       </div>
     </motion.div>
   );

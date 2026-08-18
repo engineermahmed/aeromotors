@@ -16,7 +16,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const fields = [
       "make", "model", "year", "price", "mileage", "transmission", "fuelType",
       "bodyStyle", "color", "driveType", "engineSize", "horsepower",
-      "images", "description", "features", "isNew", "isFeatured", "status", "vin",
+      "images", "description", "features", "isNew", "isFeatured", "status", "vin", "carfaxUrl",
     ] as const;
     for (const f of fields) {
       if (body[f] !== undefined) patch[f] = body[f];

@@ -41,6 +41,7 @@ export async function POST(req: NextRequest) {
       isFeatured: Boolean(body.isFeatured),
       status: body.status || "available",
       vin: body.vin || undefined,
+      carfaxUrl: body.carfaxUrl || undefined,
       createdAt: new Date().toISOString().split("T")[0],
     };
     return NextResponse.json(addVehicle(vehicle), { status: 201 });

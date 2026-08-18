@@ -19,6 +19,7 @@ export interface Vehicle {
   isFeatured: boolean;
   status: "available" | "sold" | "reserved";
   vin?: string;
+  carfaxUrl?: string;
   createdAt: string;
 }
 

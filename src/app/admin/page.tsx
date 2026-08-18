@@ -39,7 +39,7 @@ const emptyVehicle: Omit<Vehicle, "id" | "createdAt"> = {
   transmission: "Automatic", fuelType: "Petrol", bodyStyle: "Sedan",
   color: "", driveType: "FWD", engineSize: "", horsepower: 0,
   images: [""], description: "", features: [],
-  isNew: false, isFeatured: false, status: "available", vin: "",
+  isNew: false, isFeatured: false, status: "available", vin: "", carfaxUrl: "",
 };
 
 const inputCls = "w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-3 py-2.5 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors";
@@ -205,6 +205,13 @@ function VehicleModal({
               <label className={labelCls}>VIN</label>
               <input className={inputCls} placeholder="1HGCV2F34LA012874" value={form.vin} onChange={(e) => set("vin", e.target.value)} />
             </div>
+          </div>
+
+          {/* CarFax URL */}
+          <div>
+            <label className={labelCls}>CarFax Report URL</label>
+            <input className={inputCls} placeholder="https://www.carfax.ca/..." value={form.carfaxUrl ?? ""} onChange={(e) => set("carfaxUrl", e.target.value)} />
+            <p className="text-[#8F8F93] text-xs mt-1">Paste the CarFax report link — a CarFax badge will appear on the listing.</p>
           </div>
 
           {/* Image Upload */}
