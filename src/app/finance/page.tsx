@@ -26,6 +26,8 @@ export default function FinancePage() {
   const [term, setTerm] = useState(84);
   const [rate, setRate] = useState(5.99);
   const [availableTerms, setAvailableTerms] = useState([24, 36, 48, 60, 72, 84]);
+  const [taxIncluded, setTaxIncluded] = useState(false);
+  const [licensingIncluded, setLicensingIncluded] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", phone: "", income: "", employment: "Employed", vehiclePrice: "" });
   const [submitted, setSubmitted] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -44,14 +46,21 @@ export default function FinancePage() {
   }, []);
 
   const loanAmount = vehicle - downPayment;
+  const effectiveLoanAmount = useMemo(() => {
+    let amt = loanAmount;
+    if (taxIncluded) amt = Math.round(amt * 1.13 * 100) / 100;
+    if (licensingIncluded) amt = Math.round((amt + 180) * 100) / 100;
+    return amt;
+  }, [loanAmount, taxIncluded, licensingIncluded]);
+
   const monthly = useMemo(() => {
     const r = rate / 100 / 12;
-    if (r === 0) return loanAmount / term;
-    return (loanAmount * r * Math.pow(1 + r, term)) / (Math.pow(1 + r, term) - 1);
-  }, [loanAmount, term, rate]);
+    if (r === 0) return effectiveLoanAmount / term;
+    return (effectiveLoanAmount * r * Math.pow(1 + r, term)) / (Math.pow(1 + r, term) - 1);
+  }, [effectiveLoanAmount, term, rate]);
 
   const totalRepayable = monthly * term;
-  const totalInterest = totalRepayable - loanAmount;
+  const totalInterest = totalRepayable - effectiveLoanAmount;
 
   const fmt = (n: number) => new Intl.NumberFormat("en-CA", { style: "currency", currency: "CAD", currencyDisplay: "code", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
   const inputCls = "w-full bg-[#2A2A2A] border border-[#404040] text-white placeholder-[#8F8F93] rounded px-4 py-3 text-sm focus:outline-none focus:border-[#8F8F93] transition-colors";
@@ -147,11 +156,53 @@ export default function FinancePage() {
                   </div>
                 </div>
 
+                {/* Add-on toggles */}
+                <div className="flex flex-wrap gap-3 mb-5">
+                  <button
+                    type="button"
+                    onClick={() => setTaxIncluded((v) => !v)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded border text-sm font-medium transition-all cursor-pointer ${taxIncluded ? "bg-white text-[#1F1E1C] border-white" : "bg-transparent text-[#BDBDBD] border-[#404040] hover:border-[#8F8F93] hover:text-white"}`}
+                  >
+                    <span className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 ${taxIncluded ? "bg-[#1F1E1C] border-[#1F1E1C]" : "border-current"}`}>
+                      {taxIncluded && <CheckCircle className="w-3 h-3" />}
+                    </span>
+                    Add Tax (13% HST)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLicensingIncluded((v) => !v)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded border text-sm font-medium transition-all cursor-pointer ${licensingIncluded ? "bg-white text-[#1F1E1C] border-white" : "bg-transparent text-[#BDBDBD] border-[#404040] hover:border-[#8F8F93] hover:text-white"}`}
+                  >
+                    <span className={`w-4 h-4 rounded-sm border flex items-center justify-center shrink-0 ${licensingIncluded ? "bg-[#1F1E1C] border-[#1F1E1C]" : "border-current"}`}>
+                      {licensingIncluded && <CheckCircle className="w-3 h-3" />}
+                    </span>
+                    Add Licensing & Fees (+CAD 180)
+                  </button>
+                </div>
+
                 <div className="space-y-3 p-6 bg-[#2A2A2A] rounded-lg border border-[#404040]">
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#8F8F93]">Loan Amount</span>
+                    <span className="text-[#8F8F93]">Base Loan Amount</span>
                     <span className="text-white font-medium">{fmt(loanAmount)}</span>
                   </div>
+                  {taxIncluded && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#8F8F93]">HST (13%)</span>
+                      <span className="text-white font-medium">+ {fmt(loanAmount * 0.13)}</span>
+                    </div>
+                  )}
+                  {licensingIncluded && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#8F8F93]">Licensing & Fees</span>
+                      <span className="text-white font-medium">+ CAD 180.00</span>
+                    </div>
+                  )}
+                  {(taxIncluded || licensingIncluded) && (
+                    <div className="flex justify-between text-sm border-t border-[#404040] pt-3">
+                      <span className="text-[#8F8F93]">Total Financed</span>
+                      <span className="text-white font-medium">{fmt(effectiveLoanAmount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-[#8F8F93]">Total Interest</span>
                     <span className="text-white font-medium">{fmt(totalInterest)}</span>
@@ -160,6 +211,7 @@ export default function FinancePage() {
                     <span className="text-[#8F8F93]">Total Repayable</span>
                     <span className="text-white font-medium">{fmt(totalRepayable)}</span>
                   </div>
+
                   <div className="border-t border-[#404040] pt-3 flex justify-between items-end">
                     <span className="text-[#BDBDBD] text-sm">Monthly Payment</span>
                     <span className="font-heading font-bold text-white text-4xl">{fmt(monthly)}<span className="text-[#8F8F93] text-base font-normal">/mo</span></span>
