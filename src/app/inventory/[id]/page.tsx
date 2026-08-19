@@ -340,11 +340,24 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
               <div className="sticky top-24 space-y-5">
                 <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}
                   className="bg-[#252525] border border-[#404040] rounded-xl p-7">
-                  <div className="flex items-center gap-2 mb-3">
-                    {vehicle.isFeatured && <span className="text-xs px-2 py-0.5 bg-white text-[#1F1E1C] rounded font-semibold">FEATURED</span>}
-                    <span className={`text-xs px-2 py-0.5 rounded font-semibold border ${vehicle.status === "available" ? "border-green-800 text-green-400" : "border-[#404040] text-[#8F8F93]"}`}>
-                      {vehicle.status.toUpperCase()}
-                    </span>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      {vehicle.isFeatured && <span className="text-xs px-2 py-0.5 bg-white text-[#1F1E1C] rounded font-semibold">FEATURED</span>}
+                      <span className={`text-xs px-2 py-0.5 rounded font-semibold border ${vehicle.status === "available" ? "border-green-800 text-green-400" : "border-[#404040] text-[#8F8F93]"}`}>
+                        {vehicle.status.toUpperCase()}
+                      </span>
+                    </div>
+                    {vehicle.carfaxUrl && (
+                      <a
+                        href={vehicle.carfaxUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-white rounded px-2 py-1 hover:opacity-80 transition-opacity shrink-0"
+                        title="View CarFax Report"
+                      >
+                        <img src="/carfax-canada.svg" alt="CarFax Canada" width={80} height={12} />
+                      </a>
+                    )}
                   </div>
                   <p className="font-heading font-bold text-white text-4xl mb-1">{formattedPrice}</p>
                   <p className="text-[#8F8F93] text-sm mb-6">
@@ -429,20 +442,6 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                       </div>
                     </div>
                   ))}
-                  {vehicle.carfaxUrl && (
-                    <div className="pt-4 mt-1">
-                      <a
-                        href={vehicle.carfaxUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center w-full py-2.5 bg-white rounded hover:opacity-90 transition-opacity"
-                        title="View CarFax Report"
-                      >
-                        <img src="/carfax-canada.svg" alt="CarFax Canada" width={120} height={18} />
-                      </a>
-                      <p className="text-[#8F8F93] text-xs text-center mt-2">View full vehicle history report</p>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

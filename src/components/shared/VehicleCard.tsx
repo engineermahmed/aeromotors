@@ -162,10 +162,10 @@ export default function VehicleCard({ vehicle, index = 0 }: VehicleCardProps) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="absolute bottom-[72px] right-4 z-20 bg-white rounded px-2 py-1 shadow-lg hover:opacity-90 transition-opacity"
+            className="absolute top-3 right-3 z-20 bg-white rounded px-1.5 py-0.5 shadow-lg hover:opacity-90 transition-opacity"
             title="View CarFax Report"
           >
-            <img src="/carfax-canada.svg" alt="CarFax Canada" width={90} height={14} />
+            <img src="/carfax-canada.svg" alt="CarFax Canada" width={66} height={10} />
           </a>
         )}
         </div>
